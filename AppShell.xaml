@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Navigation de l'application :
+    - « login » : écran de connexion (sans barre du bas)
+    - « main »  : les 3 onglets Rechercher · Mes billets · Profil
+    Les écrans empilés (résultats, siège, paiement, billet…) sont enregistrés dans AppShell.xaml.cs.
+-->
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:auth="clr-namespace:BusTicket.Views.Auth"
+       xmlns:h="clr-namespace:BusTicket.Helpers"
+       xmlns:profile="clr-namespace:BusTicket.Views.Profile"
+       xmlns:search="clr-namespace:BusTicket.Views.Search"
+       xmlns:t="clr-namespace:BusTicket.Theme"
+       xmlns:tickets="clr-namespace:BusTicket.Views.Tickets"
+       x:Class="BusTicket.AppShell"
+       Shell.FlyoutBehavior="Disabled"
+       Shell.NavBarHasShadow="False"
+       Shell.BackgroundColor="{x:Static t:AppColors.Background}"
+       Shell.ForegroundColor="{x:Static t:AppColors.TextPrimary}"
+       Shell.TitleColor="{x:Static t:AppColors.TextPrimary}"
+       Shell.TabBarBackgroundColor="{x:Static t:AppColors.Surface}"
+       Shell.TabBarForegroundColor="{x:Static t:AppColors.Primary}"
+       Shell.TabBarTitleColor="{x:Static t:AppColors.Primary}"
+       Shell.TabBarUnselectedColor="{x:Static t:AppColors.TextSecondary}">
+
+    <ShellContent Route="login" ContentTemplate="{DataTemplate auth:LoginPage}" />
+
+    <TabBar Route="main">
+        <Tab Title="Rechercher" Route="search">
+            <Tab.Icon>
+                <FontImageSource FontFamily="MaterialIcons" Glyph="{x:Static h:MaterialIcons.Search}" Size="24" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate search:SearchPage}" />
+        </Tab>
+        <Tab Title="Mes billets" Route="tickets">
+            <Tab.Icon>
+                <FontImageSource FontFamily="MaterialIcons" Glyph="{x:Static h:MaterialIcons.Ticket}" Size="24" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate tickets:MyTicketsPage}" />
+        </Tab>
+        <Tab Title="Profil" Route="profile">
+            <Tab.Icon>
+                <FontImageSource FontFamily="MaterialIcons" Glyph="{x:Static h:MaterialIcons.Person}" Size="24" />
+            </Tab.Icon>
+            <ShellContent ContentTemplate="{DataTemplate profile:ProfilePage}" />
+        </Tab>
+    </TabBar>
+</Shell>

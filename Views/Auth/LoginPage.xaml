@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Maquettes 01 (normal), 01b (erreur), 01c (chargement). -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:BusTicket.Controls"
+             xmlns:h="clr-namespace:BusTicket.Helpers"
+             xmlns:vm="clr-namespace:BusTicket.ViewModels"
+             x:Class="BusTicket.Views.Auth.LoginPage"
+             x:DataType="vm:LoginViewModel"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView>
+            <VerticalStackLayout Padding="16,40,16,16">
+                <HorizontalStackLayout Spacing="12">
+                    <Image Source="app_logo.png" WidthRequest="48" HeightRequest="48" />
+                    <Label Text="BusTicket" Style="{StaticResource Brand}" />
+                </HorizontalStackLayout>
+
+                <Label Text="Bon retour !" Style="{StaticResource Headline}" Margin="0,32,0,12" />
+                <Label Text="Connectez-vous pour réserver et retrouver vos billets."
+                       Style="{StaticResource BodySecondary}" Margin="0,0,0,24" />
+
+                <c:AlertBanner Kind="Error" Message="{Binding BannerError}" Margin="0,0,0,20" />
+
+                <c:AppTextField Label="E-mail ou téléphone"
+                                Placeholder="jean.dupont@mail.com"
+                                Icon="{x:Static h:MaterialIcons.Mail}"
+                                Keyboard="Email"
+                                Text="{Binding Identifier}"
+                                ErrorText="{Binding IdentifierError}"
+                                IsEnabled="{Binding IsIdle}" />
+
+                <c:AppTextField Label="Mot de passe"
+                                Icon="{x:Static h:MaterialIcons.Lock}"
+                                IsPassword="True"
+                                Text="{Binding Password}"
+                                ErrorText="{Binding PasswordError}"
+                                IsEnabled="{Binding IsIdle}"
+                                Margin="0,20,0,0" />
+
+                <Label Text="Mot de passe oublié ?" Style="{StaticResource Link}"
+                       HorizontalOptions="End" Padding="0,16">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+
+                <c:AppButton Text="Se connecter"
+                             LoadingText="Connexion…"
+                             IsLoading="{Binding IsLoading}"
+                             Command="{Binding LoginCommand}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <HorizontalStackLayout Grid.Row="1" HorizontalOptions="Center" Spacing="6" Padding="0,8,0,24">
+            <Label Text="Pas encore de compte ?" Style="{StaticResource BodySecondary}" />
+            <Label Text="Créer un compte" Style="{StaticResource Link}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoToRegisterCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+        </HorizontalStackLayout>
+    </Grid>
+</ContentPage>

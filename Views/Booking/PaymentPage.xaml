@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Maquettes 06 (normal), 06b (refusé), 06c (en cours). -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:BusTicket.Controls"
+             xmlns:h="clr-namespace:BusTicket.Helpers"
+             xmlns:t="clr-namespace:BusTicket.Theme"
+             xmlns:vm="clr-namespace:BusTicket.ViewModels"
+             x:Class="BusTicket.Views.Booking.PaymentPage"
+             x:DataType="vm:PaymentViewModel"
+             Title="Paiement"
+             Shell.TabBarIsVisible="False">
+
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView x:Name="Scroller">
+            <VerticalStackLayout Padding="16" Spacing="16">
+                <c:AlertBanner Kind="Error" Message="{Binding RefusedMessage}" />
+
+                <!-- Récapitulatif -->
+                <Border Style="{StaticResource MutedBox}" Padding="16">
+                    <VerticalStackLayout>
+                        <Label Text="{Binding Route}" Style="{StaticResource Subtitle}" />
+                        <Label Text="{Binding TripDetails}" Style="{StaticResource Caption}" Margin="0,8,0,12" />
+                        <BoxView HeightRequest="1" Color="{x:Static t:AppColors.Disabled}" Margin="0,0,0,6" />
+                        <c:InfoRow Label="{Binding TicketLabel}" Value="{Binding TicketPrice}" />
+                        <c:InfoRow Label="Frais de service" Value="{Binding FeeText}" />
+                        <c:InfoRow Label="Total" Value="{Binding TotalText}" IsTotal="True" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="Moyen de paiement" Style="{StaticResource Title}" Margin="0,8,0,0" />
+
+                <VerticalStackLayout Spacing="16" BindableLayout.ItemsSource="{Binding Options}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:PaymentOption">
+                            <c:OptionTile Title="{Binding Method.Label}"
+                                          Description="{Binding Method.Description}"
+                                          Icon="{Binding Method.Icon}"
+                                          IsSelected="{Binding IsSelected}"
+                                          IsEnabled="{Binding IsIdle, Source={RelativeSource AncestorType={x:Type vm:PaymentViewModel}}, x:DataType=vm:PaymentViewModel}"
+                                          Command="{Binding SelectMethodCommand, Source={RelativeSource AncestorType={x:Type vm:PaymentViewModel}}, x:DataType=vm:PaymentViewModel}"
+                                          CommandParameter="{Binding .}" />
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <c:AppTextField x:Name="AccountField"
+                                Label="{Binding FieldLabel}"
+                                Placeholder="{Binding FieldPlaceholder}"
+                                Icon="{Binding FieldIcon}"
+                                Keyboard="Telephone"
+                                Text="{Binding AccountNumber}"
+                                ErrorText="{Binding FieldError}"
+                                IsEnabled="{Binding IsIdle}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <VerticalStackLayout Grid.Row="1" Padding="16,8,16,16" Spacing="12">
+            <c:AppButton Text="{Binding PayButtonText}"
+                         LoadingText="Paiement en cours…"
+                         IsLoading="{Binding IsPaying}"
+                         Command="{Binding PayCommand}" />
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
+                <Label Text="{x:Static h:MaterialIcons.Lock}" Style="{StaticResource Icon}" FontSize="16" />
+                <Label Text="Paiement sécurisé · aucune donnée bancaire stockée" Style="{StaticResource Small}" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

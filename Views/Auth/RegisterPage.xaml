@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Maquette 02 : le bouton reste grisé tant que tout n'est pas rempli et accepté. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:BusTicket.Controls"
+             xmlns:h="clr-namespace:BusTicket.Helpers"
+             xmlns:vm="clr-namespace:BusTicket.ViewModels"
+             x:Class="BusTicket.Views.Auth.RegisterPage"
+             x:DataType="vm:RegisterViewModel"
+             Title="Créer un compte"
+             Shell.TabBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+            <Label Text="Quelques informations pour réserver vos billets." Style="{StaticResource BodySecondary}"
+                   Margin="0,0,0,8" />
+
+            <c:AppTextField Label="Nom complet" Placeholder="Jean Dupont"
+                            Icon="{x:Static h:MaterialIcons.Person}"
+                            Text="{Binding FullName}" ErrorText="{Binding FullNameError}" />
+
+            <c:AppTextField Label="E-mail" Placeholder="jean.dupont@mail.com" Keyboard="Email"
+                            Icon="{x:Static h:MaterialIcons.Mail}"
+                            Text="{Binding Email}" ErrorText="{Binding EmailError}" />
+
+            <c:AppTextField Label="Téléphone" Placeholder="+237 6 XX XX XX XX" Keyboard="Telephone"
+                            Icon="{x:Static h:MaterialIcons.Phone}"
+                            Text="{Binding Phone}" ErrorText="{Binding PhoneError}" />
+
+            <c:AppTextField Label="Mot de passe" IsPassword="True"
+                            Icon="{x:Static h:MaterialIcons.Lock}"
+                            HelperText="8 caractères minimum, dont 1 chiffre"
+                            Text="{Binding Password}" ErrorText="{Binding PasswordError}" />
+
+            <c:AppTextField Label="Confirmer le mot de passe" Placeholder="Ressaisir le mot de passe" IsPassword="True"
+                            Icon="{x:Static h:MaterialIcons.Lock}"
+                            Text="{Binding Confirm}" ErrorText="{Binding ConfirmError}" />
+
+            <HorizontalStackLayout Spacing="8">
+                <CheckBox IsChecked="{Binding AcceptedTerms}" VerticalOptions="Center" />
+                <Label Text="J'accepte les conditions d'utilisation" Style="{StaticResource Body}" VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleTermsCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+
+            <c:AppButton Text="Créer mon compte"
+                         LoadingText="Création du compte…"
+                         IsEnabled="{Binding CanSubmit}"
+                         IsLoading="{Binding IsLoading}"
+                         Command="{Binding CreateAccountCommand}" />
+
+            <Label Text="Remplissez tous les champs et acceptez les conditions pour continuer."
+                   Style="{StaticResource Caption}" HorizontalTextAlignment="Center"
+                   IsVisible="{Binding ShowSubmitHint}" />
+
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                <Label Text="Déjà inscrit ?" Style="{StaticResource BodySecondary}" />
+                <Label Text="Se connecter" Style="{StaticResource Link}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BackToLoginCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

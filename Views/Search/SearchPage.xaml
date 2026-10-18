@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Onglet « Rechercher » — maquettes 03 et 03b. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:BusTicket.Controls"
+             xmlns:h="clr-namespace:BusTicket.Helpers"
+             xmlns:s="clr-namespace:BusTicket.Services"
+             xmlns:t="clr-namespace:BusTicket.Theme"
+             xmlns:vm="clr-namespace:BusTicket.ViewModels"
+             x:Class="BusTicket.Views.Search.SearchPage"
+             x:DataType="vm:SearchViewModel"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,40,16,16" Spacing="24">
+            <VerticalStackLayout Spacing="8">
+                <Label Text="{Binding Greeting}" Style="{StaticResource Headline}" />
+                <Label Text="Où allez-vous aujourd'hui ?" Style="{StaticResource BodySecondary}" />
+            </VerticalStackLayout>
+
+            <!-- Formulaire -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="16">
+                    <Grid RowDefinitions="Auto,Auto" RowSpacing="16">
+                        <c:AppSelectField Label="Départ" Placeholder="Ville de départ"
+                                          Icon="{x:Static h:MaterialIcons.Location}"
+                                          Value="{Binding From}" Command="{Binding PickFromCommand}" />
+                        <c:AppSelectField Grid.Row="1" Label="Arrivée" Placeholder="Ville d'arrivée"
+                                          Icon="{x:Static h:MaterialIcons.Location}"
+                                          Value="{Binding To}" ErrorText="{Binding ArrivalError}"
+                                          Command="{Binding PickToCommand}" />
+
+                        <!-- Bouton rond qui inverse départ et arrivée, à cheval sur les deux champs -->
+                        <Border Grid.RowSpan="2" WidthRequest="44" HeightRequest="44"
+                                HorizontalOptions="End" VerticalOptions="Start" Margin="0,60,16,0"
+                                Stroke="{x:Static t:AppColors.Border}" BackgroundColor="White"
+                                StrokeShape="RoundRectangle 22"
+                                SemanticProperties.Description="Inverser départ et arrivée">
+                            <Label Text="{x:Static h:MaterialIcons.SwapVert}" Style="{StaticResource Icon}"
+                                   TextColor="{x:Static t:AppColors.Primary}" />
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SwapCommand}" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <c:AppDateField Label="Date" Date="{Binding Date}" />
+                        <c:AppSelectField Grid.Column="1" Label="Passagers"
+                                          Icon="{x:Static h:MaterialIcons.People}"
+                                          Value="{Binding PassengersText}" Command="{Binding PickPassengersCommand}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <c:AppButton Text="Rechercher" IsEnabled="{Binding CanSearch}" Command="{Binding SearchCommand}" />
+
+            <!-- Recherches récentes -->
+            <VerticalStackLayout IsVisible="{Binding HasRecent}" Margin="0,8,0,0">
+                <Label Text="Recherches récentes" Style="{StaticResource Title}" Margin="0,0,0,4" />
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Recent}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="s:RecentSearch">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="20" HeightRequest="56">
+                                <Label Text="{x:Static h:MaterialIcons.Schedule}" Style="{StaticResource Icon}" />
+                                <Label Grid.Column="1" Text="{Binding Route}" Style="{StaticResource Body}" VerticalOptions="Center" />
+                                <Label Grid.Column="2" Text="{x:Static h:MaterialIcons.ChevronRight}" Style="{StaticResource Icon}" />
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding SearchRecentCommand, Source={RelativeSource AncestorType={x:Type vm:SearchViewModel}}, x:DataType=vm:SearchViewModel}"
+                                        CommandParameter="{Binding .}" />
+                                </Grid.GestureRecognizers>
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <c:EmptyState IsVisible="{Binding HasNoRecent}" IconSize="64"
+                          Icon="{x:Static h:MaterialIcons.Schedule}"
+                          Title="Aucune recherche récente"
+                          Message="Vos derniers trajets apparaîtront ici pour les retrouver en un geste." />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

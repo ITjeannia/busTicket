@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Maquettes 04 (liste), 04b (chargement), 04c (aucun trajet), 04d (erreur réseau). -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:BusTicket.Controls"
+             xmlns:h="clr-namespace:BusTicket.Helpers"
+             xmlns:items="clr-namespace:BusTicket.ViewModels.Items"
+             xmlns:t="clr-namespace:BusTicket.Theme"
+             xmlns:vm="clr-namespace:BusTicket.ViewModels"
+             x:Class="BusTicket.Views.Search.ResultsPage"
+             x:DataType="vm:ResultsViewModel"
+             Title="{Binding Title}">
+
+    <Grid RowDefinitions="Auto,*" Padding="16,8,16,0" RowSpacing="16">
+        <c:SegmentedTabs Items="{Binding DayLabels}" SelectedIndex="{Binding SelectedDayIndex}" />
+
+        <!-- Chargement -->
+        <VerticalStackLayout Grid.Row="1" Spacing="12" IsVisible="{Binding IsLoading}">
+            <Label Text="Recherche des départs disponibles…" Style="{StaticResource Caption}" />
+            <c:SkeletonCard />
+            <c:SkeletonCard />
+            <c:SkeletonCard />
+            <c:SkeletonCard />
+        </VerticalStackLayout>
+
+        <!-- Liste des départs -->
+        <CollectionView Grid.Row="1" IsVisible="{Binding IsLoaded}" ItemsSource="{Binding Trips}" SelectionMode="None">
+            <CollectionView.Header>
+                <Label Text="{Binding CountText}" Style="{StaticResource Caption}" Margin="0,0,0,12" />
+            </CollectionView.Header>
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="items:TripItem">
+                    <Border Style="{StaticResource Card}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsFull}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{x:Static t:AppColors.SurfaceMuted}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding OpenTripCommand, Source={RelativeSource AncestorType={x:Type vm:ResultsViewModel}}, x:DataType=vm:ResultsViewModel}"
+                                CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+
+                        <VerticalStackLayout Spacing="8">
+                            <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" ColumnSpacing="8">
+                                <Label Text="{Binding DepartureTime}" Style="{StaticResource TripTime}">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsFull}" Value="True">
+                                            <Setter Property="TextColor" Value="{x:Static t:AppColors.TextSecondary}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <Label Grid.Column="1" Text="{x:Static h:MaterialIcons.ChevronRight}" Style="{StaticResource Icon}" FontSize="20" />
+                                <Label Grid.Column="2" Text="{Binding ArrivalTime}" Style="{StaticResource TripTime}">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsFull}" Value="True">
+                                            <Setter Property="TextColor" Value="{x:Static t:AppColors.TextSecondary}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <Label Grid.Column="4" Text="{Binding PriceText}" Style="{StaticResource TripTime}"
+                                       TextColor="{x:Static t:AppColors.Primary}">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsFull}" Value="True">
+                                            <Setter Property="TextColor" Value="{x:Static t:AppColors.TextSecondary}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Grid>
+
+                            <Label Text="{Binding Details}" Style="{StaticResource Caption}" />
+
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8" Margin="0,4,0,0">
+                                <Label Text="{x:Static h:MaterialIcons.Bus}" Style="{StaticResource Icon}" FontSize="18" />
+                                <Label Grid.Column="1" Text="{Binding Company}" Style="{StaticResource Caption}" VerticalOptions="Center" />
+                                <Label Grid.Column="2" Text="{x:Static h:MaterialIcons.People}" Style="{StaticResource Icon}" FontSize="18"
+                                       TextColor="{x:Static t:AppColors.Success}" IsVisible="{Binding IsAvailable}" />
+                                <Label Grid.Column="3" Text="{Binding SeatsText}" Style="{StaticResource Caption}" FontFamily="RobotoMedium"
+                                       TextColor="{x:Static t:AppColors.Success}" VerticalOptions="Center" IsVisible="{Binding IsAvailable}" />
+                                <c:StatusChip Grid.Column="3" Kind="Full" IsVisible="{Binding IsFull}" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.Footer>
+                <BoxView HeightRequest="16" Color="Transparent" />
+            </CollectionView.Footer>
+        </CollectionView>
+
+        <!-- Aucun départ -->
+        <c:EmptyState Grid.Row="1" IsVisible="{Binding IsEmpty}"
+                      Icon="{x:Static h:MaterialIcons.Bus}"
+                      Title="Aucun départ ce jour"
+                      Message="{Binding EmptyMessage}"
+                      ActionText="{Binding NextDayText}"
+                      ActionVariant="Outlined"
+                      ActionCommand="{Binding ShowNextDayCommand}" />
+
+        <!-- Erreur réseau -->
+        <Grid Grid.Row="1" RowDefinitions="Auto,*" IsVisible="{Binding IsError}">
+            <c:AlertBanner Kind="Neutral" Message="Vous êtes hors ligne. Les données affichées peuvent ne pas être à jour." />
+            <c:EmptyState Grid.Row="1"
+                          Icon="{x:Static h:MaterialIcons.Download}"
+                          Title="Connexion impossible"
+                          Message="Nous n'avons pas pu charger les horaires. Vérifiez votre connexion puis réessayez."
+                          ActionText="Réessayer"
+                          ActionCommand="{Binding RetryCommand}" />
+        </Grid>
+    </Grid>
+</ContentPage>

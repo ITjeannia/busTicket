@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Onglet « Mes billets » — maquettes 07 et 07b. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:BusTicket.Controls"
+             xmlns:h="clr-namespace:BusTicket.Helpers"
+             xmlns:items="clr-namespace:BusTicket.ViewModels.Items"
+             xmlns:t="clr-namespace:BusTicket.Theme"
+             xmlns:vm="clr-namespace:BusTicket.ViewModels"
+             x:Class="BusTicket.Views.Tickets.MyTicketsPage"
+             x:DataType="vm:MyTicketsViewModel"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,Auto,*" Padding="16,40,16,0" RowSpacing="16">
+        <Label Text="Mes billets" Style="{StaticResource Headline}" />
+        <c:SegmentedTabs Grid.Row="1" Items="{Binding TabLabels}" SelectedIndex="{Binding SelectedTab}" />
+
+        <CollectionView Grid.Row="2" IsVisible="{Binding HasTickets}" ItemsSource="{Binding Tickets}" SelectionMode="None">
+            <CollectionView.Header>
+                <c:AlertBanner Kind="Info" Message="{Binding InfoMessage}" Margin="0,0,0,16" />
+            </CollectionView.Header>
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="items:TicketItem">
+                    <Border Style="{StaticResource Card}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding OpenTicketCommand, Source={RelativeSource AncestorType={x:Type vm:MyTicketsViewModel}}, x:DataType=vm:MyTicketsViewModel}"
+                                CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Border WidthRequest="40" HeightRequest="40" StrokeThickness="0" StrokeShape="RoundRectangle 8"
+                                    BackgroundColor="{x:Static t:AppColors.PrimarySoft}" VerticalOptions="Center">
+                                <Label Text="{x:Static h:MaterialIcons.Ticket}" Style="{StaticResource Icon}"
+                                       TextColor="{x:Static t:AppColors.Primary}" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="{Binding DateText}" Style="{StaticResource Caption}" FontFamily="RobotoMedium"
+                                       TextColor="{x:Static t:AppColors.Primary}" />
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                    <Label Text="{Binding Route}" Style="{StaticResource Subtitle}" VerticalOptions="Center" />
+                                    <c:StatusChip Grid.Column="1" Kind="{Binding Status}" />
+                                </Grid>
+                                <Label Text="{Binding Details}" Style="{StaticResource Caption}" LineBreakMode="TailTruncation" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.Footer>
+                <BoxView HeightRequest="16" Color="Transparent" />
+            </CollectionView.Footer>
+        </CollectionView>
+
+        <c:EmptyState Grid.Row="2" IsVisible="{Binding IsEmpty}"
+                      Icon="{x:Static h:MaterialIcons.Ticket}"
+                      Title="{Binding EmptyTitle}"
+                      Message="{Binding EmptyMessage}"
+                      ActionText="{Binding EmptyActionText}"
+                      ActionCommand="{Binding GoToSearchCommand}" />
+    </Grid>
+</ContentPage>

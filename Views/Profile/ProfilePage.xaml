@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Onglet « Profil » — maquette 09. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:BusTicket.Controls"
+             xmlns:h="clr-namespace:BusTicket.Helpers"
+             xmlns:t="clr-namespace:BusTicket.Theme"
+             xmlns:vm="clr-namespace:BusTicket.ViewModels"
+             x:Class="BusTicket.Views.Profile.ProfilePage"
+             x:DataType="vm:ProfileViewModel"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+        <Label Text="Profil" Style="{StaticResource Headline}" Margin="16,40,16,16" />
+
+        <!-- Utilisateur -->
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*" ColumnSpacing="16" Padding="16,0,16,16">
+            <Border WidthRequest="56" HeightRequest="56" StrokeThickness="0" StrokeShape="RoundRectangle 28"
+                    BackgroundColor="{x:Static t:AppColors.PrimarySoft}">
+                <Label Text="{Binding Initials}" FontFamily="RobotoBold" FontSize="18"
+                       TextColor="{x:Static t:AppColors.Primary}"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                <Label Text="{Binding FullName}" Style="{StaticResource Title}" FontFamily="RobotoBold" />
+                <Label Text="{Binding Email}" Style="{StaticResource Caption}" />
+            </VerticalStackLayout>
+        </Grid>
+
+        <BoxView Grid.Row="2" HeightRequest="1" Color="{x:Static t:AppColors.Border}" />
+
+        <!-- Menu -->
+        <ScrollView Grid.Row="3">
+            <VerticalStackLayout Padding="0,8">
+                <c:MenuRow Icon="{x:Static h:MaterialIcons.Person}" Text="Informations personnelles" Command="{Binding ComingSoonCommand}" />
+                <c:MenuRow Icon="{x:Static h:MaterialIcons.CreditCard}" Text="Moyens de paiement" Command="{Binding ComingSoonCommand}" />
+                <c:MenuRow Icon="{x:Static h:MaterialIcons.DarkMode}" Text="Thème sombre" Command="{Binding ComingSoonCommand}" />
+                <c:MenuRow Icon="{x:Static h:MaterialIcons.Language}" Text="Langue · Français" Command="{Binding ComingSoonCommand}" />
+                <c:MenuRow Icon="{x:Static h:MaterialIcons.Info}" Text="Aide et contact" Command="{Binding ComingSoonCommand}" />
+                <c:MenuRow Icon="{x:Static h:MaterialIcons.Logout}" Text="Se déconnecter" IsDestructive="True" Command="{Binding LogoutCommand}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Label Grid.Row="4" Text="{Binding Footer}" Style="{StaticResource Small}"
+               HorizontalTextAlignment="Center" Margin="16" />
+    </Grid>
+</ContentPage>
