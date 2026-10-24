@@ -45,5 +45,15 @@
 	</dict>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+	<key>NSCameraUsageDescription</key>
+	<string>La caméra sert à scanner le QR code des billets (espace contrôleur).</string>
+	<!-- Développement : autorise l'API locale en HTTP (à retirer avec un serveur HTTPS) -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

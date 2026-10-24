@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace BusTicket.Helpers;
+namespace BusTicket.Core;
 
 /// <summary>
 /// Règles de validation des formulaires, partagées entre écrans.

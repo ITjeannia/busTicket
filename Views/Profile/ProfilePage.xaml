@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Onglet « Profil » — maquette 09. -->
+<!-- Onglet « Profil » : compte, statistiques, espace contrôleur, serveur, aide, déconnexion. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:c="clr-namespace:BusTicket.Controls"
@@ -10,38 +10,105 @@
              x:DataType="vm:ProfileViewModel"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
-        <Label Text="Profil" Style="{StaticResource Headline}" Margin="16,40,16,16" />
+    <ScrollView>
+        <VerticalStackLayout>
+            <!-- En-tête -->
+            <Grid Style="{StaticResource HeaderBand}" Padding="20,44,20,60" ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                <Border WidthRequest="64" HeightRequest="64" StrokeThickness="3" Stroke="{x:Static t:AppColors.PrimaryMuted}"
+                        StrokeShape="RoundRectangle 32" BackgroundColor="White" c:Motion.Entrance="Pop">
+                    <Label Text="{Binding Initials}" FontFamily="RobotoBold" FontSize="22"
+                           TextColor="{x:Static t:AppColors.Primary}"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2" c:Motion.Entrance="FadeUp">
+                    <Label Text="{Binding FullName}" Style="{StaticResource Title}" TextColor="White" />
+                    <Label Text="{Binding Email}" Style="{StaticResource OnPrimaryMuted}" />
+                    <Label Text="{Binding Phone}" Style="{StaticResource OnPrimaryMuted}" />
+                </VerticalStackLayout>
+            </Grid>
 
-        <!-- Utilisateur -->
-        <Grid Grid.Row="1" ColumnDefinitions="Auto,*" ColumnSpacing="16" Padding="16,0,16,16">
-            <Border WidthRequest="56" HeightRequest="56" StrokeThickness="0" StrokeShape="RoundRectangle 28"
-                    BackgroundColor="{x:Static t:AppColors.PrimarySoft}">
-                <Label Text="{Binding Initials}" FontFamily="RobotoBold" FontSize="18"
-                       TextColor="{x:Static t:AppColors.Primary}"
-                       HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
-            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                <Label Text="{Binding FullName}" Style="{StaticResource Title}" FontFamily="RobotoBold" />
-                <Label Text="{Binding Email}" Style="{StaticResource Caption}" />
+            <VerticalStackLayout Padding="16,0,16,16" Margin="0,-40,0,0" Spacing="16">
+                <!-- Statistiques -->
+                <Border Style="{StaticResource Card}" Padding="0" c:Motion.Entrance="FadeUp" c:Motion.Delay="80">
+                    <Grid ColumnDefinitions="*,1,*">
+                        <VerticalStackLayout Padding="16,14" HorizontalOptions="Center">
+                            <Label Text="{Binding TicketsCount}" FontFamily="RobotoBold" FontSize="24"
+                                   TextColor="{x:Static t:AppColors.Primary}" HorizontalOptions="Center" />
+                            <Label Text="Billets à venir" Style="{StaticResource Small}" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                        <BoxView Grid.Column="1" Color="{x:Static t:AppColors.Divider}" Margin="0,12" />
+                        <VerticalStackLayout Grid.Column="2" Padding="16,14" HorizontalOptions="Center">
+                            <Label Text="{Binding TripsCount}" FontFamily="RobotoBold" FontSize="24" HorizontalOptions="Center" />
+                            <Label Text="Voyages effectués" Style="{StaticResource Small}" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenTicketsCommand}" />
+                        </Grid.GestureRecognizers>
+                    </Grid>
+                </Border>
+
+                <c:AlertBanner Kind="Warning" Message="{Binding LocalAccountMessage}" />
+
+                <!-- Contrôle -->
+                <Label Text="Contrôle" Style="{StaticResource Overline}" Margin="4,4,0,-8" />
+                <Border Style="{StaticResource Card}" Padding="0" c:Motion.Entrance="FadeUp" c:Motion.Delay="120">
+                    <c:MenuRow Icon="{x:Static h:MaterialIcons.QrScanner}" Text="Espace contrôleur"
+                               Subtitle="Scanner et valider les billets à l'embarquement"
+                               Command="{Binding OpenScannerCommand}" />
+                </Border>
+
+                <!-- Serveur -->
+                <Label Text="Connexion" Style="{StaticResource Overline}" Margin="4,4,0,-8" />
+                <Border Style="{StaticResource Card}" Padding="0" c:Motion.Entrance="FadeUp" c:Motion.Delay="160">
+                    <VerticalStackLayout>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" Padding="16,12">
+                            <Border Style="{StaticResource IconTile}" WidthRequest="36" HeightRequest="36"
+                                    BackgroundColor="{x:Static t:AppColors.SuccessSoft}">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsOnline}" Value="False">
+                                        <Setter Property="BackgroundColor" Value="{x:Static t:AppColors.WarningSoft}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Label Text="{x:Static h:MaterialIcons.CloudDone}" Style="{StaticResource Icon}" FontSize="20"
+                                       TextColor="{x:Static t:AppColors.Success}">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsOnline}" Value="False">
+                                            <Setter Property="Text" Value="{x:Static h:MaterialIcons.CloudOff}" />
+                                            <Setter Property="TextColor" Value="{x:Static t:AppColors.Warning}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="{Binding ServerStatus}" Style="{StaticResource Value}" />
+                                <Label Text="{Binding ServerUrl}" Style="{StaticResource Small}" LineBreakMode="MiddleTruncation" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="Tester" Style="{StaticResource Link}" FontSize="14" VerticalOptions="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding TestConnectionCommand}" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </Grid>
+                        <BoxView Style="{StaticResource Divider}" />
+                        <c:MenuRow Icon="{x:Static h:MaterialIcons.Dns}" Text="Adresse du serveur"
+                                   Subtitle="Pour un téléphone : adresse IP du PC qui fait tourner l'API"
+                                   Command="{Binding EditServerCommand}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Assistance -->
+                <Label Text="Assistance" Style="{StaticResource Overline}" Margin="4,4,0,-8" />
+                <Border Style="{StaticResource Card}" Padding="0" c:Motion.Entrance="FadeUp" c:Motion.Delay="200">
+                    <VerticalStackLayout>
+                        <c:MenuRow Icon="{x:Static h:MaterialIcons.Support}" Text="Aide et contact" Command="{Binding HelpCommand}" />
+                        <BoxView Style="{StaticResource Divider}" />
+                        <c:MenuRow Icon="{x:Static h:MaterialIcons.Logout}" Text="Se déconnecter" IsDestructive="True"
+                                   Command="{Binding LogoutCommand}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="{Binding Footer}" Style="{StaticResource Small}" HorizontalTextAlignment="Center" Margin="0,8" />
             </VerticalStackLayout>
-        </Grid>
-
-        <BoxView Grid.Row="2" HeightRequest="1" Color="{x:Static t:AppColors.Border}" />
-
-        <!-- Menu -->
-        <ScrollView Grid.Row="3">
-            <VerticalStackLayout Padding="0,8">
-                <c:MenuRow Icon="{x:Static h:MaterialIcons.Person}" Text="Informations personnelles" Command="{Binding ComingSoonCommand}" />
-                <c:MenuRow Icon="{x:Static h:MaterialIcons.CreditCard}" Text="Moyens de paiement" Command="{Binding ComingSoonCommand}" />
-                <c:MenuRow Icon="{x:Static h:MaterialIcons.DarkMode}" Text="Thème sombre" Command="{Binding ComingSoonCommand}" />
-                <c:MenuRow Icon="{x:Static h:MaterialIcons.Language}" Text="Langue · Français" Command="{Binding ComingSoonCommand}" />
-                <c:MenuRow Icon="{x:Static h:MaterialIcons.Info}" Text="Aide et contact" Command="{Binding ComingSoonCommand}" />
-                <c:MenuRow Icon="{x:Static h:MaterialIcons.Logout}" Text="Se déconnecter" IsDestructive="True" Command="{Binding LogoutCommand}" />
-            </VerticalStackLayout>
-        </ScrollView>
-
-        <Label Grid.Row="4" Text="{Binding Footer}" Style="{StaticResource Small}"
-               HorizontalTextAlignment="Center" Margin="16" />
-    </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

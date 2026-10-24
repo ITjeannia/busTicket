@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="160" viewBox="0 0 200 160">
+  <!-- Reçu + coche verte (paiement réussi) -->
+  <circle cx="100" cy="80" r="70" fill="#E8F5E9"/>
+  <path d="M62 30 H138 V132 L129 126 L120 132 L111 126 L102 132 L93 126 L84 132 L75 126 L66 132 L62 129 Z"
+        fill="#FFFFFF" stroke="#D6D5DF" stroke-width="1.5"/>
+  <rect x="74" y="44" width="40" height="6" rx="3" fill="#1565C0"/>
+  <rect x="74" y="60" width="52" height="4" rx="2" fill="#E7E8EE"/>
+  <rect x="74" y="70" width="44" height="4" rx="2" fill="#E7E8EE"/>
+  <rect x="74" y="80" width="52" height="4" rx="2" fill="#E7E8EE"/>
+  <line x1="74" y1="94" x2="126" y2="94" stroke="#D6D5DF" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <rect x="74" y="102" width="22" height="6" rx="3" fill="#5F6368"/>
+  <rect x="104" y="102" width="22" height="6" rx="3" fill="#1565C0"/>
+  <circle cx="140" cy="112" r="24" fill="#2E7D32"/>
+  <circle cx="140" cy="112" r="24" fill="none" stroke="#FFFFFF" stroke-width="4"/>
+  <path d="M129 112 L137 120 L152 104" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="44" cy="40" r="4" fill="#FFB74D"/>
+  <rect x="160" y="34" width="8" height="8" rx="2" fill="#90CAF9" transform="rotate(20 164 38)"/>
+  <circle cx="36" cy="110" r="3" fill="#1565C0"/>
+  <rect x="166" y="70" width="6" height="6" rx="1" fill="#FFB74D" transform="rotate(-15 169 73)"/>
+</svg>

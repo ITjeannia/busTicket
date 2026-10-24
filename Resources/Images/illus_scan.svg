@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="150" viewBox="0 0 220 150">
+  <!-- Téléphone qui scanne un QR code (contrôle des billets) -->
+  <ellipse cx="110" cy="138" rx="70" ry="8" fill="#E3F2FD"/>
+  <rect x="72" y="10" width="76" height="126" rx="12" fill="#263238"/>
+  <rect x="78" y="22" width="64" height="104" rx="4" fill="#FFFFFF"/>
+  <rect x="100" y="14" width="20" height="3" rx="1.5" fill="#546E7A"/>
+  <g fill="#1C1B1F">
+    <rect x="90" y="44" width="16" height="16"/><rect x="114" y="44" width="16" height="16"/>
+    <rect x="90" y="68" width="16" height="16"/>
+    <rect x="114" y="68" width="6" height="6"/><rect x="124" y="74" width="6" height="10"/><rect x="114" y="78" width="6" height="6"/>
+  </g>
+  <g fill="#FFFFFF">
+    <rect x="94" y="48" width="8" height="8"/><rect x="118" y="48" width="8" height="8"/><rect x="94" y="72" width="8" height="8"/>
+  </g>
+  <g fill="none" stroke="#1565C0" stroke-width="3.5" stroke-linecap="round">
+    <path d="M84 46 V36 H94"/><path d="M126 36 H136 V46"/>
+    <path d="M136 84 V94 H126"/><path d="M94 94 H84 V84"/>
+  </g>
+  <rect x="80" y="63" width="60" height="3" rx="1.5" fill="#2E7D32"/>
+  <rect x="88" y="104" width="44" height="10" rx="3" fill="#E8F5E9"/>
+  <rect x="96" y="108" width="28" height="2.5" rx="1.25" fill="#2E7D32"/>
+  <circle cx="160" cy="30" r="14" fill="#2E7D32"/>
+  <path d="M153 30 L158 35 L167 25" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

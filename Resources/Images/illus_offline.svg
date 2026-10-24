@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="150" viewBox="0 0 220 150">
+  <!-- Nuage barré (connexion impossible) -->
+  <ellipse cx="110" cy="136" rx="80" ry="9" fill="#E3F2FD"/>
+  <path d="M66 110 C46 110 38 92 50 80 C46 60 68 50 82 60 C88 40 120 34 134 52 C150 44 172 56 168 76 C186 80 184 110 162 110 Z"
+        fill="#FFFFFF" stroke="#D6D5DF" stroke-width="2"/>
+  <path d="M80 98 C70 98 66 90 72 84 C70 74 80 70 88 74 C92 62 112 60 120 70 C130 66 142 72 140 84 C150 86 148 98 138 98 Z" fill="#E3F2FD"/>
+  <line x1="62" y1="40" x2="160" y2="124" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+  <line x1="62" y1="40" x2="160" y2="124" stroke="#B3261E" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="176" cy="38" r="5" fill="#BBDEFB"/>
+  <circle cx="40" cy="58" r="4" fill="#BBDEFB"/>
+  <circle cx="190" cy="92" r="3" fill="#90CAF9"/>
+</svg>

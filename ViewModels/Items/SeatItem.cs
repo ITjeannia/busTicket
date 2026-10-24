@@ -12,5 +12,8 @@ public partial class SeatItem(int number, SeatStatus status) : ObservableObject
     [ObservableProperty] public partial SeatStatus Status { get; set; } = status;
 }
 
-/// <summary>Une rangée du bus : 2 sièges à gauche de l'allée, 2 à droite (null = pas de siège).</summary>
+/// <summary>
+/// Une rangée du bus. Classique : 2 sièges + allée + 2 sièges.
+/// VIP : 2 sièges + allée + 1 siège (RightAisle reste vide). null = pas de siège.
+/// </summary>
 public record SeatRow(SeatItem? LeftWindow, SeatItem? LeftAisle, SeatItem? RightAisle, SeatItem? RightWindow);

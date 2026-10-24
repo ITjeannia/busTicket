@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Espace contrôleur : scan du QR code (caméra) ou saisie de la référence, puis validation de l'embarquement. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:BusTicket.Controls"
+             xmlns:h="clr-namespace:BusTicket.Helpers"
+             xmlns:t="clr-namespace:BusTicket.Theme"
+             xmlns:vm="clr-namespace:BusTicket.ViewModels"
+             x:Class="BusTicket.Views.Tickets.ScannerPage"
+             x:DataType="vm:ScannerViewModel"
+             Title="Contrôle des billets"
+             Shell.TabBarIsVisible="False"
+             BackgroundColor="{x:Static t:AppColors.ScannerBackdrop}">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Zone caméra -->
+        <Grid HeightRequest="360">
+            <!-- La vue caméra est insérée ici par le code (Android / iOS) -->
+            <ContentView x:Name="CameraHost" />
+
+            <!-- Sans caméra (Windows) : illustration -->
+            <VerticalStackLayout x:Name="NoCamera" IsVisible="False" VerticalOptions="Center" Spacing="10" Padding="24">
+                <Image Source="illus_scan.png" HeightRequest="150" />
+                <Label Text="Caméra non disponible sur cet appareil" TextColor="White" FontFamily="RobotoMedium"
+                       HorizontalOptions="Center" />
+                <Label Text="Saisissez la référence imprimée sous le QR code." TextColor="{x:Static t:AppColors.PrimaryMuted}"
+                       FontSize="13" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- Cadre de visée + ligne de scan animée -->
+            <Grid x:Name="Viewfinder" WidthRequest="240" HeightRequest="240" HorizontalOptions="Center" VerticalOptions="Center">
+                <BoxView x:Name="ScanLine" HeightRequest="3" VerticalOptions="Start" Margin="10,0"
+                         Color="{x:Static t:AppColors.Success}" Opacity="0.9" />
+                <!-- Coins -->
+                <BoxView WidthRequest="34" HeightRequest="4" Color="White" HorizontalOptions="Start" VerticalOptions="Start" />
+                <BoxView WidthRequest="4" HeightRequest="34" Color="White" HorizontalOptions="Start" VerticalOptions="Start" />
+                <BoxView WidthRequest="34" HeightRequest="4" Color="White" HorizontalOptions="End" VerticalOptions="Start" />
+                <BoxView WidthRequest="4" HeightRequest="34" Color="White" HorizontalOptions="End" VerticalOptions="Start" />
+                <BoxView WidthRequest="34" HeightRequest="4" Color="White" HorizontalOptions="Start" VerticalOptions="End" />
+                <BoxView WidthRequest="4" HeightRequest="34" Color="White" HorizontalOptions="Start" VerticalOptions="End" />
+                <BoxView WidthRequest="34" HeightRequest="4" Color="White" HorizontalOptions="End" VerticalOptions="End" />
+                <BoxView WidthRequest="4" HeightRequest="34" Color="White" HorizontalOptions="End" VerticalOptions="End" />
+            </Grid>
+
+            <Border x:Name="AimHint" StrokeThickness="0" StrokeShape="RoundRectangle 4" BackgroundColor="#80000000" Padding="12,6"
+                    HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,14">
+                <HorizontalStackLayout Spacing="8">
+                    <ActivityIndicator IsRunning="{Binding IsChecking}" IsVisible="{Binding IsChecking}" Color="White"
+                                       WidthRequest="14" HeightRequest="14" />
+                    <Label Text="Placez le QR code du billet dans le cadre" TextColor="White" FontSize="13" />
+                </HorizontalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Saisie manuelle -->
+        <Border Grid.Row="1" StrokeThickness="0" StrokeShape="RoundRectangle 14,14,0,0" BackgroundColor="{x:Static t:AppColors.Background}"
+                Padding="16,20,16,16">
+            <VerticalStackLayout Spacing="14">
+                <Label Text="Saisie manuelle" Style="{StaticResource Section}" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <c:AppTextField Label="Référence du billet" Placeholder="BT-7K3Q9P" Icon="{x:Static h:MaterialIcons.Keyboard}"
+                                    Text="{Binding ManualReference}" />
+                    <c:AppButton Grid.Column="1" Text="Vérifier" VerticalOptions="End" WidthRequest="110"
+                                 IsLoading="{Binding IsChecking}" LoadingText=" " Command="{Binding VerifyManualCommand}" />
+                </Grid>
+                <c:OfflineBanner />
+                <Label Text="Chaque billet ne peut être validé qu'une fois. Le QR code est signé : un billet modifié est refusé, même hors ligne."
+                       Style="{StaticResource Small}" LineHeight="1.25" />
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Résultat du contrôle -->
+        <Grid x:Name="ResultLayer" Grid.RowSpan="3" IsVisible="{Binding HasResult}" BackgroundColor="#99000000">
+            <Border x:Name="ResultSheet" StrokeThickness="0" StrokeShape="RoundRectangle 16,16,0,0" BackgroundColor="White"
+                    VerticalOptions="End" Padding="0">
+                <VerticalStackLayout>
+                    <!-- Bandeau coloré -->
+                    <Grid BackgroundColor="{Binding ResultSoftColor}" Padding="20,22" ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                        <Label x:Name="ResultIconLabel" Text="{Binding ResultIcon}" Style="{StaticResource Icon}" FontSize="48"
+                               TextColor="{Binding ResultColor}" />
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <Label Text="{Binding ResultTitle}" Style="{StaticResource Title}" TextColor="{Binding ResultColor}" />
+                            <Label Text="{Binding ResultMessage}" Style="{StaticResource Caption}" TextColor="{x:Static t:AppColors.TextPrimary}" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Billet contrôlé -->
+                    <Grid Padding="20,16" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="10"
+                          IsVisible="{Binding HasTicketDetails}">
+                        <VerticalStackLayout>
+                            <Label Text="Trajet" Style="{StaticResource Overline}" />
+                            <Label Text="{Binding TicketRoute}" Style="{StaticResource Value}" />
+                            <Label Text="{Binding TicketWhen}" Style="{StaticResource Small}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="Référence" Style="{StaticResource Overline}" HorizontalOptions="End" />
+                            <Label Text="{Binding TicketReference}" Style="{StaticResource Value}" HorizontalOptions="End" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Row="1">
+                            <Label Text="Passager" Style="{StaticResource Overline}" />
+                            <Label Text="{Binding TicketPassenger}" Style="{StaticResource Value}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Row="1" Grid.Column="1">
+                            <Label Text="Places" Style="{StaticResource Overline}" HorizontalOptions="End" />
+                            <Label Text="{Binding TicketSeats}" Style="{StaticResource Value}" FontFamily="RobotoBold"
+                                   TextColor="{x:Static t:AppColors.Primary}" HorizontalOptions="End" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <VerticalStackLayout Padding="20,4,20,24" Spacing="10">
+                        <c:AppButton Text="Valider l'embarquement" Icon="{x:Static h:MaterialIcons.DoneAll}"
+                                     IsVisible="{Binding CanBoard}" IsLoading="{Binding IsBoarding}" LoadingText="Validation…"
+                                     Command="{Binding BoardCommand}" />
+                        <c:AppButton Text="Scanner un autre billet" Icon="{x:Static h:MaterialIcons.QrScanner}" Variant="Outlined"
+                                     Command="{Binding ScanAgainCommand}" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>

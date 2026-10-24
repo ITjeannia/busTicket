@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Onglet « Mes billets » — maquettes 07 et 07b. -->
+<!-- Onglet « Mes billets » : à venir / passés, tirer pour actualiser. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:c="clr-namespace:BusTicket.Controls"
@@ -11,51 +11,99 @@
              x:DataType="vm:MyTicketsViewModel"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,Auto,*" Padding="16,40,16,0" RowSpacing="16">
-        <Label Text="Mes billets" Style="{StaticResource Headline}" />
-        <c:SegmentedTabs Grid.Row="1" Items="{Binding TabLabels}" SelectedIndex="{Binding SelectedTab}" />
+    <Grid RowDefinitions="Auto,Auto,*">
+        <Grid Style="{StaticResource HeaderBand}" Padding="20,44,20,20" ColumnDefinitions="*,Auto">
+            <VerticalStackLayout Spacing="2">
+                <Label Text="Mes billets" Style="{StaticResource Headline}" TextColor="White" />
+                <Label Text="{Binding CountText}" Style="{StaticResource OnPrimaryMuted}" />
+            </VerticalStackLayout>
+            <Border Grid.Column="1" Style="{StaticResource IconTile}" BackgroundColor="{x:Static t:AppColors.PrimaryDark}"
+                    WidthRequest="44" HeightRequest="44">
+                <Label Text="{x:Static h:MaterialIcons.Ticket}" Style="{StaticResource Icon}" TextColor="White" />
+            </Border>
+        </Grid>
 
-        <CollectionView Grid.Row="2" IsVisible="{Binding HasTickets}" ItemsSource="{Binding Tickets}" SelectionMode="None">
-            <CollectionView.Header>
-                <c:AlertBanner Kind="Info" Message="{Binding InfoMessage}" Margin="0,0,0,16" />
-            </CollectionView.Header>
-            <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />
-            </CollectionView.ItemsLayout>
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="items:TicketItem">
-                    <Border Style="{StaticResource Card}">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer
-                                Command="{Binding OpenTicketCommand, Source={RelativeSource AncestorType={x:Type vm:MyTicketsViewModel}}, x:DataType=vm:MyTicketsViewModel}"
-                                CommandParameter="{Binding .}" />
-                        </Border.GestureRecognizers>
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                            <Border WidthRequest="40" HeightRequest="40" StrokeThickness="0" StrokeShape="RoundRectangle 8"
-                                    BackgroundColor="{x:Static t:AppColors.PrimarySoft}" VerticalOptions="Center">
-                                <Label Text="{x:Static h:MaterialIcons.Ticket}" Style="{StaticResource Icon}"
-                                       TextColor="{x:Static t:AppColors.Primary}" />
-                            </Border>
-                            <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                <Label Text="{Binding DateText}" Style="{StaticResource Caption}" FontFamily="RobotoMedium"
-                                       TextColor="{x:Static t:AppColors.Primary}" />
-                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                                    <Label Text="{Binding Route}" Style="{StaticResource Subtitle}" VerticalOptions="Center" />
-                                    <c:StatusChip Grid.Column="1" Kind="{Binding Status}" />
+        <VerticalStackLayout Grid.Row="1" Padding="16,12,16,4" Spacing="12" BackgroundColor="White">
+            <c:SegmentedTabs Items="{Binding TabLabels}" SelectedIndex="{Binding SelectedTab}" />
+        </VerticalStackLayout>
+
+        <RefreshView Grid.Row="2" IsRefreshing="{Binding IsRefreshing}" Command="{Binding ReloadCommand}"
+                     IsVisible="{Binding HasTickets}">
+            <CollectionView ItemsSource="{Binding Tickets}" SelectionMode="None">
+                <CollectionView.Header>
+                    <VerticalStackLayout Padding="16,16,16,4" Spacing="12">
+                        <c:OfflineBanner />
+                        <c:AlertBanner Kind="Info" Icon="{x:Static h:MaterialIcons.CloudDone}" Message="{Binding InfoMessage}" />
+                    </VerticalStackLayout>
+                </CollectionView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="items:TicketItem">
+                        <ContentView Padding="16,6">
+                            <Border Style="{StaticResource Card}" Padding="0"
+                                    c:Motion.Entrance="FadeUp" c:Motion.Delay="{Binding EntranceDelay}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding OpenTicketCommand, Source={RelativeSource AncestorType={x:Type vm:MyTicketsViewModel}}, x:DataType=vm:MyTicketsViewModel}"
+                                        CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="*,Auto,84">
+                                    <!-- Partie gauche : trajet -->
+                                    <VerticalStackLayout Padding="16,14" Spacing="6">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Text="{Binding DateText}" Style="{StaticResource Overline}"
+                                                   TextColor="{x:Static t:AppColors.Primary}" />
+                                            <Label Grid.Column="1" Text="{Binding Countdown}" Style="{StaticResource Small}"
+                                                   FontFamily="RobotoMedium" TextColor="{x:Static t:AppColors.Warning}"
+                                                   IsVisible="{Binding HasCountdown}" />
+                                        </Grid>
+                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                            <VerticalStackLayout>
+                                                <Label Text="{Binding DepartureTime}" Style="{StaticResource TripTime}" FontSize="18" />
+                                                <Label Text="{Binding From}" Style="{StaticResource Small}" LineBreakMode="TailTruncation" />
+                                            </VerticalStackLayout>
+                                            <Label Grid.Column="1" Text="{x:Static h:MaterialIcons.ArrowForward}" Style="{StaticResource Icon}"
+                                                   FontSize="16" TextColor="{x:Static t:AppColors.Disabled}" />
+                                            <VerticalStackLayout Grid.Column="2">
+                                                <Label Text="{Binding ArrivalTime}" Style="{StaticResource TripTime}" FontSize="18" HorizontalOptions="End" />
+                                                <Label Text="{Binding To}" Style="{StaticResource Small}" HorizontalOptions="End" LineBreakMode="TailTruncation" />
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                        <Label Text="{Binding Details}" Style="{StaticResource Small}" LineBreakMode="TailTruncation" />
+                                        <c:StatusChip Kind="{Binding Status}" />
+                                    </VerticalStackLayout>
+
+                                    <!-- Perforation -->
+                                    <c:DashedLine Grid.Column="1" Vertical="True" WidthRequest="2" Margin="0,10" />
+
+                                    <!-- Talon : QR -->
+                                    <BoxView Grid.Column="2" Color="{x:Static t:AppColors.PrimarySoft}" />
+                                    <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="4" Padding="0,16">
+                                        <Label Text="{x:Static h:MaterialIcons.QrCode}" Style="{StaticResource Icon}" FontSize="40"
+                                               TextColor="{x:Static t:AppColors.Primary}" VerticalOptions="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsActive}" Value="False">
+                                                    <Setter Property="TextColor" Value="{x:Static t:AppColors.Disabled}" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                        <Label Text="{Binding Reference}" Style="{StaticResource Small}" FontSize="10" FontFamily="RobotoMedium"
+                                               HorizontalOptions="Center" />
+                                        <Label Text="{Binding PriceText}" Style="{StaticResource Small}" FontSize="11"
+                                               HorizontalOptions="Center" TextColor="{x:Static t:AppColors.TextPrimary}" />
+                                    </VerticalStackLayout>
                                 </Grid>
-                                <Label Text="{Binding Details}" Style="{StaticResource Caption}" LineBreakMode="TailTruncation" />
-                            </VerticalStackLayout>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-            <CollectionView.Footer>
-                <BoxView HeightRequest="16" Color="Transparent" />
-            </CollectionView.Footer>
-        </CollectionView>
+                            </Border>
+                        </ContentView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.Footer>
+                    <BoxView HeightRequest="24" Color="Transparent" />
+                </CollectionView.Footer>
+            </CollectionView>
+        </RefreshView>
 
         <c:EmptyState Grid.Row="2" IsVisible="{Binding IsEmpty}"
-                      Icon="{x:Static h:MaterialIcons.Ticket}"
+                      Illustration="illus_tickets.png"
                       Title="{Binding EmptyTitle}"
                       Message="{Binding EmptyMessage}"
                       ActionText="{Binding EmptyActionText}"

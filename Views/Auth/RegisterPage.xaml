@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Maquette 02 : le bouton reste grisé tant que tout n'est pas rempli et accepté. -->
+<!-- Création de compte : le bouton reste grisé tant que tout n'est pas rempli et accepté. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:c="clr-namespace:BusTicket.Controls"
              xmlns:h="clr-namespace:BusTicket.Helpers"
+             xmlns:t="clr-namespace:BusTicket.Theme"
              xmlns:vm="clr-namespace:BusTicket.ViewModels"
              x:Class="BusTicket.Views.Auth.RegisterPage"
              x:DataType="vm:RegisterViewModel"
@@ -12,38 +13,60 @@
 
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="16">
-            <Label Text="Quelques informations pour réserver vos billets." Style="{StaticResource BodySecondary}"
-                   Margin="0,0,0,8" />
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" c:Motion.Entrance="FadeUp">
+                <Border Style="{StaticResource IconTile}" WidthRequest="48" HeightRequest="48">
+                    <Label Text="{x:Static h:MaterialIcons.Badge}" Style="{StaticResource Icon}" FontSize="24"
+                           TextColor="{x:Static t:AppColors.Primary}" />
+                </Border>
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                    <Label Text="Bienvenue à bord" Style="{StaticResource Section}" />
+                    <Label Text="Quelques informations pour émettre vos billets à votre nom." Style="{StaticResource Caption}" />
+                </VerticalStackLayout>
+            </Grid>
 
-            <c:AppTextField Label="Nom complet" Placeholder="Jean Dupont"
-                            Icon="{x:Static h:MaterialIcons.Person}"
-                            Text="{Binding FullName}" ErrorText="{Binding FullNameError}" />
+            <c:AlertBanner Kind="Error" Message="{Binding BannerError}" />
 
-            <c:AppTextField Label="E-mail" Placeholder="jean.dupont@mail.com" Keyboard="Email"
-                            Icon="{x:Static h:MaterialIcons.Mail}"
-                            Text="{Binding Email}" ErrorText="{Binding EmailError}" />
+            <Border Style="{StaticResource Card}" Padding="16" c:Motion.Entrance="FadeUp" c:Motion.Delay="80">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="Identité" Style="{StaticResource Overline}" />
+                    <c:AppTextField Label="Nom complet" Placeholder="Jean Dupont"
+                                    Icon="{x:Static h:MaterialIcons.Person}"
+                                    Text="{Binding FullName}" ErrorText="{Binding FullNameError}"
+                                    HelperText="Tel qu'il figure sur votre pièce d'identité" />
 
-            <c:AppTextField Label="Téléphone" Placeholder="+237 6 XX XX XX XX" Keyboard="Telephone"
-                            Icon="{x:Static h:MaterialIcons.Phone}"
-                            Text="{Binding Phone}" ErrorText="{Binding PhoneError}" />
+                    <c:AppTextField Label="E-mail" Placeholder="jean.dupont@mail.com" Keyboard="Email"
+                                    Icon="{x:Static h:MaterialIcons.Mail}"
+                                    Text="{Binding Email}" ErrorText="{Binding EmailError}" />
 
-            <c:AppTextField Label="Mot de passe" IsPassword="True"
-                            Icon="{x:Static h:MaterialIcons.Lock}"
-                            HelperText="8 caractères minimum, dont 1 chiffre"
-                            Text="{Binding Password}" ErrorText="{Binding PasswordError}" />
+                    <c:AppTextField Label="Téléphone" Placeholder="+237 6 XX XX XX XX" Keyboard="Telephone"
+                                    Icon="{x:Static h:MaterialIcons.Phone}"
+                                    Text="{Binding Phone}" ErrorText="{Binding PhoneError}" />
+                </VerticalStackLayout>
+            </Border>
 
-            <c:AppTextField Label="Confirmer le mot de passe" Placeholder="Ressaisir le mot de passe" IsPassword="True"
-                            Icon="{x:Static h:MaterialIcons.Lock}"
-                            Text="{Binding Confirm}" ErrorText="{Binding ConfirmError}" />
+            <Border Style="{StaticResource Card}" Padding="16" c:Motion.Entrance="FadeUp" c:Motion.Delay="140">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="Sécurité" Style="{StaticResource Overline}" />
+                    <c:AppTextField Label="Mot de passe" IsPassword="True"
+                                    Icon="{x:Static h:MaterialIcons.Lock}"
+                                    HelperText="8 caractères minimum, dont 1 chiffre"
+                                    Text="{Binding Password}" ErrorText="{Binding PasswordError}" />
 
-            <HorizontalStackLayout Spacing="8">
+                    <c:AppTextField Label="Confirmer le mot de passe" Placeholder="Ressaisir le mot de passe" IsPassword="True"
+                                    Icon="{x:Static h:MaterialIcons.Lock}"
+                                    Text="{Binding Confirm}" ErrorText="{Binding ConfirmError}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4">
                 <CheckBox IsChecked="{Binding AcceptedTerms}" VerticalOptions="Center" />
-                <Label Text="J'accepte les conditions d'utilisation" Style="{StaticResource Body}" VerticalOptions="Center">
+                <Label Grid.Column="1" Text="J'accepte les conditions générales de vente et de transport"
+                       Style="{StaticResource Caption}" TextColor="{x:Static t:AppColors.TextPrimary}" VerticalOptions="Center">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding ToggleTermsCommand}" />
                     </Label.GestureRecognizers>
                 </Label>
-            </HorizontalStackLayout>
+            </Grid>
 
             <c:AppButton Text="Créer mon compte"
                          LoadingText="Création du compte…"
@@ -52,12 +75,12 @@
                          Command="{Binding CreateAccountCommand}" />
 
             <Label Text="Remplissez tous les champs et acceptez les conditions pour continuer."
-                   Style="{StaticResource Caption}" HorizontalTextAlignment="Center"
+                   Style="{StaticResource Small}" HorizontalTextAlignment="Center"
                    IsVisible="{Binding ShowSubmitHint}" />
 
-            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
-                <Label Text="Déjà inscrit ?" Style="{StaticResource BodySecondary}" />
-                <Label Text="Se connecter" Style="{StaticResource Link}">
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6" Margin="0,0,0,8">
+                <Label Text="Déjà inscrit ?" Style="{StaticResource BodySecondary}" FontSize="15" />
+                <Label Text="Se connecter" Style="{StaticResource Link}" FontSize="15">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding BackToLoginCommand}" />
                     </Label.GestureRecognizers>

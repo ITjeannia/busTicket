@@ -3,9 +3,9 @@ using BusTicket.Theme;
 
 namespace BusTicket.Controls;
 
-public enum ChipKind { Valid, Expired, Neutral, Full }
+public enum ChipKind { Valid, Expired, Neutral, Full, Boarded, Info, Warning }
 
-/// <summary>Petite étiquette arrondie : « Valide », « Expiré », « Complet », « Disponible hors ligne »…</summary>
+/// <summary>Petite étiquette : « Valide », « Expiré », « Embarqué », « Complet », « VIP »…</summary>
 public class StatusChip : ContentView
 {
     public static readonly BindableProperty KindProperty = Ui.Prop<StatusChip, ChipKind>(nameof(Kind), ChipKind.Valid, c => c.Refresh());
@@ -17,14 +17,15 @@ public class StatusChip : ContentView
     public string? Text { get => (string?)GetValue(TextProperty); set => SetValue(TextProperty, value); }
     public string? Icon { get => (string?)GetValue(IconProperty); set => SetValue(IconProperty, value); }
 
-    private readonly Label _icon = Ui.Icon("", 16);
-    private readonly Label _text = Ui.Text(size: AppFonts.Caption, font: AppFonts.Medium);
-    private readonly Border _box = new() { StrokeThickness = 0, StrokeShape = Ui.Rounded(AppSpacing.RadiusPill), Padding = new Thickness(10, 5) };
+    private readonly Label _icon = Ui.Icon("", 14);
+    private readonly Label _text = Ui.Text(size: AppFonts.Small, font: AppFonts.Medium);
+    private readonly Border _box = new() { StrokeThickness = 0, StrokeShape = Ui.Rounded(AppSpacing.RadiusXs), Padding = new Thickness(8, 4) };
 
     public StatusChip()
     {
         HorizontalOptions = LayoutOptions.Start;
         VerticalOptions = LayoutOptions.Center;
+        _text.VerticalOptions = LayoutOptions.Center;
         _box.Content = new HorizontalStackLayout { Spacing = AppSpacing.Xs, Children = { _icon, _text } };
         Content = _box;
         Refresh();
@@ -36,7 +37,10 @@ public class StatusChip : ContentView
         {
             ChipKind.Valid => (AppColors.Success, AppColors.SuccessSoft, "Valide", MaterialIcons.CheckCircle),
             ChipKind.Expired => (AppColors.Error, AppColors.ErrorSoft, "Expiré", MaterialIcons.Error),
-            ChipKind.Full => (AppColors.TextPrimary, AppColors.Disabled, "Complet", (string?)null),
+            ChipKind.Boarded => (AppColors.Primary, AppColors.PrimarySoft, "Embarqué", MaterialIcons.DoneAll),
+            ChipKind.Full => (AppColors.TextSecondary, AppColors.SurfaceMuted, "Complet", (string?)null),
+            ChipKind.Info => (AppColors.Primary, AppColors.PrimarySoft, "", (string?)null),
+            ChipKind.Warning => (AppColors.Warning, AppColors.WarningSoft, "", (string?)null),
             _ => (AppColors.TextSecondary, AppColors.SurfaceMuted, "", (string?)null),
         };
         _box.BackgroundColor = bg;

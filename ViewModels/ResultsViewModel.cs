@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using BusTicket.Helpers;
+using BusTicket.Core;
 using BusTicket.Models;
 using BusTicket.Services;
 using BusTicket.ViewModels.Items;
@@ -10,19 +10,22 @@ namespace BusTicket.ViewModels;
 
 public enum LoadState { Loading, Loaded, Empty, Error }
 
-/// <summary>Maquettes 04 (liste), 04b (chargement), 04c (aucun trajet), 04d (erreur réseau).</summary>
-public partial class ResultsViewModel(TripService trips, Navigator navigator) : ObservableObject, IQueryAttributable
+/// <summary>Liste des départs : chargement, liste, aucun départ, erreur.</summary>
+public partial class ResultsViewModel(Backend backend, Navigator navigator) : ObservableObject, IQueryAttributable
 {
     private SearchQuery _query = new("", "", DateTime.Today, 1);
     private List<DateTime> _days = [];
     private bool _isUpdatingDays;
 
     [ObservableProperty] public partial string Title { get; set; } = "";
+    [ObservableProperty] public partial string Subtitle { get; set; } = "";
     [ObservableProperty] public partial IList<string> DayLabels { get; set; } = [];
     [ObservableProperty] public partial int SelectedDayIndex { get; set; }
     [ObservableProperty] public partial string CountText { get; set; } = "";
     [ObservableProperty] public partial string EmptyMessage { get; set; } = "";
     [ObservableProperty] public partial string NextDayText { get; set; } = "";
+    [ObservableProperty] public partial string? ErrorMessage { get; set; }
+    [ObservableProperty] public partial bool IsOffline { get; set; }
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(IsLoading), nameof(IsLoaded), nameof(IsEmpty), nameof(IsError))]
     public partial LoadState State { get; set; }
@@ -66,19 +69,31 @@ public partial class ResultsViewModel(TripService trips, Navigator navigator) : 
     {
         _query = _query with { Date = date.Date };
         UpdateDays(_query.Date);
+        Subtitle = $"{Formatters.LongDate(_query.Date)} · {Formatters.Passengers(_query.Passengers)}";
         State = LoadState.Loading;
         Trips.Clear();
         try
         {
-            var results = await trips.SearchAsync(_query.From, _query.To, _query.Date);
-            foreach (var trip in results) Trips.Add(new TripItem(trip));
-            CountText = $"{results.Count} départs · {Formatters.Passengers(_query.Passengers)}";
-            EmptyMessage = $"Aucun bus ne circule entre {_query.From} et {_query.To} le {Formatters.DayName(_query.Date)}. Essayez une autre date.";
+            var started = DateTime.Now;
+            var results = await backend.SearchAsync(_query.From, _query.To, _query.Date);
+            // Laisse le squelette visible un court instant : évite un clignotement quand la réponse est immédiate.
+            var elapsed = DateTime.Now - started;
+            if (elapsed < TimeSpan.FromMilliseconds(450)) await Task.Delay(TimeSpan.FromMilliseconds(450) - elapsed);
+
+            var index = 0;
+            foreach (var trip in results) Trips.Add(new TripItem(trip, _query.Passengers, index++));
+            var available = results.Count(t => t.AvailableSeats >= _query.Passengers);
+            CountText = $"{results.Count} départ{(results.Count > 1 ? "s" : "")} · {available} avec assez de places";
+            EmptyMessage = _query.Date == DateTime.Today
+                ? $"Plus aucun départ en vente aujourd'hui entre {_query.From} et {_query.To}. Essayez demain."
+                : $"Aucun bus ne circule entre {_query.From} et {_query.To} le {Formatters.DayName(_query.Date)}.";
             NextDayText = $"Voir le {Formatters.DayName(_query.Date.AddDays(1))}";
+            IsOffline = backend.IsOffline;
             State = results.Count == 0 ? LoadState.Empty : LoadState.Loaded;
         }
-        catch (Exception)
+        catch (BusTicketException e)
         {
+            ErrorMessage = e.Message;
             State = LoadState.Error;
         }
     }
@@ -90,12 +105,18 @@ public partial class ResultsViewModel(TripService trips, Navigator navigator) : 
     private Task ShowNextDayAsync() => LoadAsync(_query.Date.AddDays(1));
 
     [RelayCommand]
-    private Task OpenTripAsync(TripItem item) =>
-        item.IsFull
-            ? Task.CompletedTask
-            : navigator.GoToAsync(Routes.Seats, new Dictionary<string, object>
-            {
-                ["trip"] = item.Trip,
-                ["passengers"] = _query.Passengers,
-            });
+    private async Task OpenTripAsync(TripItem item)
+    {
+        if (item.IsFull) return;
+        if (!item.HasEnoughSeats)
+        {
+            await navigator.InfoAsync($"Il ne reste que {item.Trip.AvailableSeats} place(s) sur ce départ pour {_query.Passengers} passagers.");
+            return;
+        }
+        await navigator.GoToAsync(Routes.Seats, new Dictionary<string, object>
+        {
+            ["trip"] = item.Trip,
+            ["passengers"] = _query.Passengers,
+        });
+    }
 }

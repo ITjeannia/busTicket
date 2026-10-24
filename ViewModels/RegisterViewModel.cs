@@ -1,13 +1,12 @@
-using BusTicket.Helpers;
-using BusTicket.Models;
+using BusTicket.Core;
 using BusTicket.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace BusTicket.ViewModels;
 
-/// <summary>Maquette 02. Le bouton reste grisé tant que tout n'est pas rempli et accepté.</summary>
-public partial class RegisterViewModel(AuthService auth, Navigator navigator) : ObservableObject
+/// <summary>Création de compte. Le bouton reste grisé tant que tout n'est pas rempli et accepté.</summary>
+public partial class RegisterViewModel(Backend backend, Navigator navigator) : ObservableObject
 {
     [ObservableProperty, NotifyPropertyChangedFor(nameof(CanSubmit), nameof(ShowSubmitHint))] public partial string FullName { get; set; } = "";
     [ObservableProperty, NotifyPropertyChangedFor(nameof(CanSubmit), nameof(ShowSubmitHint))] public partial string Email { get; set; } = "";
@@ -21,6 +20,7 @@ public partial class RegisterViewModel(AuthService auth, Navigator navigator) : 
     [ObservableProperty] public partial string? PhoneError { get; set; }
     [ObservableProperty] public partial string? PasswordError { get; set; }
     [ObservableProperty] public partial string? ConfirmError { get; set; }
+    [ObservableProperty] public partial string? BannerError { get; set; }
     [ObservableProperty] public partial bool IsLoading { get; set; }
 
     public bool CanSubmit => AcceptedTerms &&
@@ -28,7 +28,6 @@ public partial class RegisterViewModel(AuthService auth, Navigator navigator) : 
 
     /// <summary>Affiche l'aide « Remplissez tous les champs… » sous le bouton.</summary>
     public bool ShowSubmitHint => !CanSubmit;
-
 
     [RelayCommand]
     private void ToggleTerms() => AcceptedTerms = !AcceptedTerms;
@@ -48,13 +47,18 @@ public partial class RegisterViewModel(AuthService auth, Navigator navigator) : 
         PhoneError = Validators.Phone(Phone);
         PasswordError = Validators.Password(Password);
         ConfirmError = Confirm == Password ? null : "Les mots de passe ne correspondent pas";
+        BannerError = null;
         if (new[] { FullNameError, EmailError, PhoneError, PasswordError, ConfirmError }.Any(e => e is not null)) return;
 
         IsLoading = true;
         try
         {
-            await auth.RegisterAsync(new User(FullName.Trim(), Email.Trim(), Phone.Trim()), Password);
+            await backend.RegisterAsync(new RegisterRequest(FullName.Trim(), Email.Trim(), Phone.Trim(), Password));
             await navigator.GoToAsync(Routes.Search);
+        }
+        catch (BusTicketException e)
+        {
+            BannerError = e.Message;
         }
         finally
         {

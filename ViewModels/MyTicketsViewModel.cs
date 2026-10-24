@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using BusTicket.Helpers;
 using BusTicket.Services;
 using BusTicket.ViewModels.Items;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -7,7 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace BusTicket.ViewModels;
 
-/// <summary>Onglet « Mes billets » — maquettes 07 et 07b.</summary>
+/// <summary>Onglet « Mes billets » : à venir / passés, tirer pour actualiser.</summary>
 public partial class MyTicketsViewModel : ObservableObject
 {
     private readonly BookingRepository _bookings;
@@ -17,7 +16,7 @@ public partial class MyTicketsViewModel : ObservableObject
     {
         _bookings = bookings;
         _navigator = navigator;
-        _bookings.Changed += (_, _) => Refresh();
+        _bookings.Changed += (_, _) => MainThread.BeginInvokeOnMainThread(Refresh);
         Refresh();
     }
 
@@ -29,15 +28,17 @@ public partial class MyTicketsViewModel : ObservableObject
     [ObservableProperty, NotifyPropertyChangedFor(nameof(HasTickets))]
     public partial bool IsEmpty { get; set; }
 
+    [ObservableProperty] public partial bool IsRefreshing { get; set; }
+    [ObservableProperty] public partial string CountText { get; set; } = "";
+
     public bool HasTickets => !IsEmpty;
     public bool IsUpcoming => SelectedTab == 0;
-    public string? InfoMessage => IsUpcoming ? "Les billets restent consultables sans connexion internet." : null;
+    public string? InfoMessage => IsUpcoming ? "Vos billets restent disponibles sans connexion internet." : null;
     public string EmptyTitle => IsUpcoming ? "Aucun billet à venir" : "Aucun billet passé";
     public string EmptyMessage => IsUpcoming
         ? "Réservez votre prochain trajet en quelques étapes. Vos billets apparaîtront ici, même hors connexion."
         : "Vos trajets effectués apparaîtront ici.";
     public string? EmptyActionText => IsUpcoming ? "Rechercher un trajet" : null;
-    public string TicketIcon => MaterialIcons.Ticket;
 
     public ObservableCollection<TicketItem> Tickets { get; } = [];
 
@@ -47,13 +48,27 @@ public partial class MyTicketsViewModel : ObservableObject
     public void Refresh()
     {
         Tickets.Clear();
-        foreach (var booking in IsUpcoming ? _bookings.Upcoming : _bookings.Past) Tickets.Add(new TicketItem(booking));
+        var list = IsUpcoming ? _bookings.Upcoming : _bookings.Past;
+        for (var i = 0; i < list.Count; i++) Tickets.Add(new TicketItem(list[i], i));
         IsEmpty = Tickets.Count == 0;
+        CountText = $"{_bookings.Upcoming.Count} à venir · {_bookings.Past.Count} passé{(_bookings.Past.Count > 1 ? "s" : "")}";
         OnPropertyChanged(nameof(IsUpcoming));
         OnPropertyChanged(nameof(InfoMessage));
         OnPropertyChanged(nameof(EmptyTitle));
         OnPropertyChanged(nameof(EmptyMessage));
         OnPropertyChanged(nameof(EmptyActionText));
+    }
+
+    /// <summary>Tirer pour actualiser : récupère les billets depuis le serveur.</summary>
+    [RelayCommand]
+    private async Task ReloadAsync()
+    {
+        try { await _bookings.RefreshAsync(); }
+        finally
+        {
+            IsRefreshing = false;
+            Refresh();
+        }
     }
 
     [RelayCommand]

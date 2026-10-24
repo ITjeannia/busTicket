@@ -9,3 +9,8 @@ obj/
 
 # OS-generated files
 .DS_Store
+
+# Base de données du serveur
+Server/*.db
+Server/*.db-shm
+Server/*.db-wal

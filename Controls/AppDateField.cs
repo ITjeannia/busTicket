@@ -18,7 +18,8 @@ public class AppDateField : ContentView
     {
         var picker = new DatePicker
         {
-            Format = "ddd d MMM",
+            // Le sélecteur Windows ajoute sa propre icône : format court pour tenir dans le champ.
+            Format = DeviceInfo.Platform == DevicePlatform.WinUI ? "dd/MM" : "ddd d MMM",
             FontFamily = AppFonts.Regular,
             FontSize = AppFonts.Body,
             TextColor = AppColors.TextPrimary,

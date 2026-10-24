@@ -3,11 +3,11 @@ using BusTicket.Theme;
 
 namespace BusTicket.Controls;
 
-public enum AlertKind { Error, Info, Neutral }
+public enum AlertKind { Error, Info, Neutral, Success, Warning }
 
 /// <summary>
-/// Bandeau de message : rouge (Error), bleu (Info) ou gris (Neutral, ex. hors ligne).
-/// Masqué automatiquement quand <see cref="Message"/> est vide.
+/// Bandeau de message avec liseré coloré à gauche : rouge (Error), bleu (Info), gris (Neutral),
+/// vert (Success), orange (Warning). Masqué automatiquement quand <see cref="Message"/> est vide.
 /// </summary>
 public class AlertBanner : ContentView
 {
@@ -22,15 +22,23 @@ public class AlertBanner : ContentView
 
     private readonly Label _icon = Ui.Icon("", 20);
     private readonly Label _message = Ui.Text(size: AppFonts.Caption);
-    private readonly Border _box = new() { StrokeThickness = 0, StrokeShape = Ui.Rounded(AppSpacing.RadiusSm), Padding = AppSpacing.Md };
+    private readonly BoxView _accent = new() { WidthRequest = 4 };
+    private readonly Border _box = new() { StrokeThickness = 0, StrokeShape = Ui.Rounded(AppSpacing.RadiusSm), Padding = 0 };
 
     public AlertBanner()
     {
         _icon.VerticalOptions = LayoutOptions.Start;
         _message.LineHeight = 1.2;
-        var row = new Grid { ColumnDefinitions = [new(GridLength.Auto), new(GridLength.Star)], ColumnSpacing = 12 };
-        row.Add(_icon, 0);
-        row.Add(_message, 1);
+        _message.VerticalOptions = LayoutOptions.Center;
+
+        var row = new Grid
+        {
+            ColumnDefinitions = [new(GridLength.Auto), new(GridLength.Auto), new(GridLength.Star)],
+            ColumnSpacing = 12,
+        };
+        row.Add(_accent, 0);
+        row.Add(new ContentView { Content = _icon, Padding = new Thickness(0, 12) }, 1);
+        row.Add(new ContentView { Content = _message, Padding = new Thickness(0, 12, 14, 12) }, 2);
         _box.Content = row;
         Content = _box;
         Refresh();
@@ -38,14 +46,17 @@ public class AlertBanner : ContentView
 
     private void Refresh()
     {
-        var (background, iconColor, glyph) = Kind switch
+        var (background, color, glyph) = Kind switch
         {
             AlertKind.Error => (AppColors.ErrorSoft, AppColors.Error, MaterialIcons.Error),
             AlertKind.Info => (AppColors.PrimarySoft, AppColors.Primary, MaterialIcons.Info),
-            _ => (AppColors.SurfaceMuted, AppColors.TextSecondary, MaterialIcons.Download),
+            AlertKind.Success => (AppColors.SuccessSoft, AppColors.Success, MaterialIcons.CheckCircle),
+            AlertKind.Warning => (AppColors.WarningSoft, AppColors.Warning, MaterialIcons.CloudOff),
+            _ => (AppColors.SurfaceMuted, AppColors.TextSecondary, MaterialIcons.Info),
         };
         _box.BackgroundColor = background;
-        _icon.TextColor = iconColor;
+        _accent.Color = color;
+        _icon.TextColor = color;
         _icon.Text = Icon ?? glyph;
         _message.Text = Message;
         IsVisible = !string.IsNullOrEmpty(Message);

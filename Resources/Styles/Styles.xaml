@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
     Styles de l'application. Les couleurs viennent de Theme/AppColors.cs (source unique),
-    les tailles de Theme/AppFonts.cs.
+    les tailles de Theme/AppFonts.cs. Style « carré » : rayons de 6 à 8, bordures fines, ombres discrètes.
 -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -26,17 +26,32 @@
         <Setter Property="Color" Value="{x:Static t:AppColors.Primary}" />
     </Style>
 
+    <Style TargetType="RefreshView">
+        <Setter Property="RefreshColor" Value="{x:Static t:AppColors.Primary}" />
+    </Style>
+
     <!-- ===== Textes ===== -->
 
-    <!-- Grand titre de page : « Bonjour Jean », « Mes billets », « Profil » -->
+    <Style x:Key="Display" TargetType="Label">
+        <Setter Property="FontFamily" Value="RobotoBold" />
+        <Setter Property="FontSize" Value="{x:Static t:AppFonts.Display}" />
+    </Style>
+
+    <!-- Grand titre de page : « Mes billets », « Profil » -->
     <Style x:Key="Headline" TargetType="Label">
         <Setter Property="FontFamily" Value="RobotoBold" />
         <Setter Property="FontSize" Value="{x:Static t:AppFonts.Headline}" />
     </Style>
 
     <Style x:Key="Title" TargetType="Label">
-        <Setter Property="FontFamily" Value="RobotoMedium" />
+        <Setter Property="FontFamily" Value="RobotoBold" />
         <Setter Property="FontSize" Value="{x:Static t:AppFonts.Title}" />
+    </Style>
+
+    <!-- Titre de section : « Moyen de paiement », « Recherches récentes » -->
+    <Style x:Key="Section" TargetType="Label">
+        <Setter Property="FontFamily" Value="RobotoBold" />
+        <Setter Property="FontSize" Value="{x:Static t:AppFonts.Subtitle}" />
     </Style>
 
     <Style x:Key="Subtitle" TargetType="Label">
@@ -64,6 +79,20 @@
         <Setter Property="TextColor" Value="{x:Static t:AppColors.TextSecondary}" />
     </Style>
 
+    <!-- Petit libellé en capitales au-dessus d'une valeur : « PASSAGER », « SIÈGE » -->
+    <Style x:Key="Overline" TargetType="Label">
+        <Setter Property="FontFamily" Value="RobotoMedium" />
+        <Setter Property="FontSize" Value="{x:Static t:AppFonts.Overline}" />
+        <Setter Property="CharacterSpacing" Value="0.8" />
+        <Setter Property="TextColor" Value="{x:Static t:AppColors.TextSecondary}" />
+        <Setter Property="TextTransform" Value="Uppercase" />
+    </Style>
+
+    <Style x:Key="Value" TargetType="Label">
+        <Setter Property="FontFamily" Value="RobotoMedium" />
+        <Setter Property="FontSize" Value="{x:Static t:AppFonts.Body}" />
+    </Style>
+
     <Style x:Key="Link" TargetType="Label">
         <Setter Property="FontFamily" Value="RobotoMedium" />
         <Setter Property="FontSize" Value="{x:Static t:AppFonts.Body}" />
@@ -72,7 +101,7 @@
 
     <Style x:Key="Brand" TargetType="Label">
         <Setter Property="FontFamily" Value="RobotoBold" />
-        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontSize" Value="20" />
         <Setter Property="TextColor" Value="{x:Static t:AppColors.Primary}" />
         <Setter Property="VerticalOptions" Value="Center" />
     </Style>
@@ -80,13 +109,18 @@
     <!-- Heures et prix des trajets -->
     <Style x:Key="TripTime" TargetType="Label">
         <Setter Property="FontFamily" Value="RobotoBold" />
-        <Setter Property="FontSize" Value="{x:Static t:AppFonts.Title}" />
+        <Setter Property="FontSize" Value="22" />
         <Setter Property="VerticalOptions" Value="Center" />
     </Style>
 
-    <!-- Texte de l'en-tête bleu du billet -->
-    <Style x:Key="TicketHeader" TargetType="Label">
+    <!-- Textes sur fond bleu (en-têtes) -->
+    <Style x:Key="OnPrimary" TargetType="Label">
         <Setter Property="TextColor" Value="{x:Static t:AppColors.TextOnPrimary}" />
+    </Style>
+
+    <Style x:Key="OnPrimaryMuted" TargetType="Label">
+        <Setter Property="FontSize" Value="{x:Static t:AppFonts.Caption}" />
+        <Setter Property="TextColor" Value="{x:Static t:AppColors.PrimaryMuted}" />
     </Style>
 
     <!-- Icône Material (police MaterialIcons) -->
@@ -100,38 +134,68 @@
 
     <!-- ===== Conteneurs ===== -->
 
-    <!-- Carte bordée (formulaire, trajet, billet de la liste, plan du bus) -->
+    <!-- Carte blanche bordée, ombre légère -->
     <Style x:Key="Card" TargetType="Border">
-        <Setter Property="Stroke" Value="{x:Static t:AppColors.Border}" />
+        <Setter Property="Stroke" Value="{x:Static t:AppColors.Divider}" />
         <Setter Property="StrokeThickness" Value="1" />
-        <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 8" />
         <Setter Property="BackgroundColor" Value="{x:Static t:AppColors.Surface}" />
         <Setter Property="Padding" Value="16" />
+        <Setter Property="Shadow">
+            <Shadow Brush="#1565C0" Opacity="0.06" Radius="10" Offset="0,3" />
+        </Setter>
     </Style>
 
     <!-- Encadré gris (récapitulatif, rappel du trajet) -->
     <Style x:Key="MutedBox" TargetType="Border">
         <Setter Property="StrokeThickness" Value="0" />
-        <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 6" />
         <Setter Property="BackgroundColor" Value="{x:Static t:AppColors.SurfaceMuted}" />
+    </Style>
+
+    <!-- Encadré bleu pâle -->
+    <Style x:Key="SoftBox" TargetType="Border">
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 6" />
+        <Setter Property="BackgroundColor" Value="{x:Static t:AppColors.PrimarySoft}" />
+    </Style>
+
+    <!-- Pastille carrée contenant une icône -->
+    <Style x:Key="IconTile" TargetType="Border">
+        <Setter Property="WidthRequest" Value="40" />
+        <Setter Property="HeightRequest" Value="40" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 6" />
+        <Setter Property="BackgroundColor" Value="{x:Static t:AppColors.PrimarySoft}" />
+        <Setter Property="VerticalOptions" Value="Center" />
+    </Style>
+
+    <!-- Bandeau bleu en haut des onglets -->
+    <Style x:Key="HeaderBand" TargetType="Grid">
+        <Setter Property="BackgroundColor" Value="{x:Static t:AppColors.Primary}" />
     </Style>
 
     <!-- Barre fixe en bas d'écran (résumé + bouton) -->
     <Style x:Key="BottomBar" TargetType="Border">
         <Setter Property="StrokeThickness" Value="0" />
         <Setter Property="BackgroundColor" Value="{x:Static t:AppColors.Surface}" />
-        <Setter Property="Padding" Value="16" />
+        <Setter Property="Padding" Value="16,12,16,16" />
         <Setter Property="Shadow">
-            <Shadow Brush="Black" Opacity="0.08" Radius="4" Offset="0,-1" />
+            <Shadow Brush="Black" Opacity="0.10" Radius="12" Offset="0,-2" />
         </Setter>
     </Style>
 
     <!-- Petite case de la légende des sièges -->
     <Style x:Key="LegendBox" TargetType="Border">
-        <Setter Property="WidthRequest" Value="22" />
-        <Setter Property="HeightRequest" Value="22" />
-        <Setter Property="StrokeShape" Value="RoundRectangle 5" />
+        <Setter Property="WidthRequest" Value="18" />
+        <Setter Property="HeightRequest" Value="18" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 4" />
         <Setter Property="Stroke" Value="{x:Static t:AppColors.Border}" />
         <Setter Property="BackgroundColor" Value="{x:Static t:AppColors.Surface}" />
+    </Style>
+
+    <Style x:Key="Divider" TargetType="BoxView">
+        <Setter Property="HeightRequest" Value="1" />
+        <Setter Property="Color" Value="{x:Static t:AppColors.Divider}" />
     </Style>
 </ResourceDictionary>

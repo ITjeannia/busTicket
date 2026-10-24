@@ -1,4 +1,4 @@
-using BusTicket.Helpers;
+using BusTicket.Core;
 using BusTicket.Models;
 using BusTicket.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -13,88 +13,132 @@ public partial class PaymentOption(PaymentMethod method) : ObservableObject
     [ObservableProperty] public partial bool IsSelected { get; set; }
 }
 
-/// <summary>Maquettes 06 (normal), 06b (refusé), 06c (en cours).</summary>
-public partial class PaymentViewModel(AuthService auth, BookingRepository bookings, Navigator navigator)
+public enum StepState { Pending, Active, Done }
+
+/// <summary>Une étape de l'écran « Paiement en cours ».</summary>
+public partial class PaymentStep(string text) : ObservableObject
+{
+    public string Text { get; } = text;
+
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(IsPending), nameof(IsActive), nameof(IsDone))]
+    public partial StepState State { get; set; }
+
+    public bool IsPending => State == StepState.Pending;
+    public bool IsActive => State == StepState.Active;
+    public bool IsDone => State == StepState.Done;
+}
+
+/// <summary>
+/// Paiement. Aucune passerelle n'est branchée : le paiement est simulé et toujours accepté,
+/// quel que soit le numéro saisi. Le billet et le reçu sont émis immédiatement.
+/// </summary>
+public partial class PaymentViewModel(Backend backend, BookingRepository bookings, Navigator navigator)
     : ObservableObject, IQueryAttributable
 {
-    private Trip? _trip;
+    private TripDto? _trip;
     private List<int> _seats = [];
 
     public IReadOnlyList<PaymentOption> Options { get; } = PaymentMethod.All.Select(m => new PaymentOption(m)).ToList();
 
+    public IReadOnlyList<PaymentStep> Steps { get; } =
+    [
+        new("Connexion à l'opérateur"),
+        new("Confirmation du paiement"),
+        new("Émission du billet et du reçu"),
+    ];
+
     [ObservableProperty] public partial string Route { get; set; } = "";
+    [ObservableProperty] public partial string TripDate { get; set; } = "";
+    [ObservableProperty] public partial string TripTimes { get; set; } = "";
     [ObservableProperty] public partial string TripDetails { get; set; } = "";
     [ObservableProperty] public partial string TicketLabel { get; set; } = "";
     [ObservableProperty] public partial string TicketPrice { get; set; } = "";
     [ObservableProperty] public partial string TotalText { get; set; } = "";
-    public string FeeText { get; } = Formatters.Price(MockData.ServiceFee);
+    public string FeeText { get; } = Formatters.Price(Catalog.ServiceFee);
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(FieldLabel), nameof(FieldIcon), nameof(FieldPlaceholder))]
-    public partial PaymentMethod Method { get; set; } = PaymentMethod.MobileMoney;
+    [ObservableProperty] public partial string PassengerName { get; set; } = "";
+    [ObservableProperty] public partial string? PassengerError { get; set; }
+
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(FieldLabel), nameof(FieldIcon), nameof(FieldPlaceholder), nameof(FieldKeyboard), nameof(FieldHelp))]
+    public partial PaymentMethod Method { get; set; } = PaymentMethod.OrangeMoney;
 
     public string FieldLabel => Method.FieldLabel;
     public string FieldIcon => Method.FieldIcon;
     public string FieldPlaceholder => Method.FieldPlaceholder;
+    public Keyboard FieldKeyboard => Method.Keyboard;
+    public string FieldHelp => Method.Kind == PaymentMethodKind.Card
+        ? "Mode démonstration : aucun montant n'est réellement débité."
+        : "Mode démonstration : la demande de confirmation est validée automatiquement.";
 
     [ObservableProperty] public partial string AccountNumber { get; set; } = "";
     [ObservableProperty] public partial string? FieldError { get; set; }
+    [ObservableProperty] public partial string? ErrorMessage { get; set; }
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(IsIdle))]
     public partial bool IsPaying { get; set; }
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(PayButtonText), nameof(RefusedMessage))]
-    public partial bool WasRefused { get; set; }
-
     public bool IsIdle => !IsPaying;
-    public string PayButtonText => WasRefused ? "Réessayer le paiement" : $"Payer {TotalText}";
-    public string? RefusedMessage => WasRefused
-        ? "Paiement refusé. Vérifiez vos informations ou choisissez un autre moyen de paiement."
-        : null;
+    public string PayButtonText => $"Payer {TotalText}";
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        _trip = (Trip)query["trip"];
+        _trip = (TripDto)query["trip"];
         _seats = (List<int>)query["seats"];
 
         Route = _trip.Route;
-        TripDetails = $"{Formatters.ShortDate(_trip.Departure)} · {Formatters.Time(_trip.Departure)} – " +
-                      $"{Formatters.Time(_trip.Arrival)} · {Formatters.Seats(_seats)}";
-        TicketLabel = $"Billet ({Formatters.Adults(_seats.Count)})";
+        TripDate = Formatters.LongDate(_trip.Departure);
+        TripTimes = $"{Formatters.Time(_trip.Departure)} → {Formatters.Time(_trip.Arrival)}";
+        TripDetails = $"{_trip.Company} · {_trip.ServiceClass} · {Formatters.Seats(_seats)}";
+        TicketLabel = $"Billet{(_seats.Count > 1 ? "s" : "")} ({_seats.Count} × {Formatters.Price(_trip.Price)})";
         TicketPrice = Formatters.Price(_trip.Price * _seats.Count);
-        TotalText = Formatters.Price(_trip.Price * _seats.Count + MockData.ServiceFee);
+        TotalText = Formatters.Price(_trip.Price * _seats.Count + Catalog.ServiceFee);
+        PassengerName = backend.CurrentUser?.FullName ?? "";
         OnPropertyChanged(nameof(PayButtonText));
         SelectMethod(Options[0]);
     }
 
     partial void OnAccountNumberChanged(string value) => FieldError = null;
+    partial void OnPassengerNameChanged(string value) => PassengerError = null;
 
     [RelayCommand]
     private void SelectMethod(PaymentOption option)
     {
         foreach (var o in Options) o.IsSelected = o == option;
         Method = option.Method;
-        AccountNumber = Method.Kind == PaymentMethodKind.MobileMoney ? auth.CurrentUser?.Phone ?? "" : "";
+        AccountNumber = Method.Kind == PaymentMethodKind.Card ? "" : backend.CurrentUser?.Phone ?? "";
     }
 
     [RelayCommand]
     private async Task PayAsync()
     {
-        FieldError = Method.Kind == PaymentMethodKind.MobileMoney
-            ? Validators.Phone(AccountNumber)
-            : Validators.CardNumber(AccountNumber);
-        if (FieldError is not null) return;
+        // Seule vérification : le champ ne doit pas être vide. Le numéro lui-même n'est jamais refusé.
+        PassengerError = Validators.Required(PassengerName);
+        FieldError = string.IsNullOrWhiteSpace(AccountNumber) ? "Saisissez le numéro à débiter" : null;
+        ErrorMessage = null;
+        if (PassengerError is not null || FieldError is not null) return;
 
+        foreach (var step in Steps) step.State = StepState.Pending;
         IsPaying = true;
-        WasRefused = false;
         try
         {
-            var booking = await bookings.PayAsync(_trip!, _seats, auth.CurrentUser?.FullName ?? "", Method, AccountNumber);
-            await navigator.ShowNewTicketAsync(new Dictionary<string, object> { ["booking"] = booking });
+            var request = new CreateBookingRequest(_trip!.Id, _seats, PassengerName.Trim(), Method.Kind, AccountNumber.Trim());
+            var booking = bookings.BookAsync(request);
+
+            // Étapes affichées pendant le traitement (au moins ~2 s pour que l'utilisateur les voie).
+            foreach (var step in Steps)
+            {
+                step.State = StepState.Active;
+                await Task.WhenAll(Task.Delay(700), step == Steps[^1] ? booking : Task.CompletedTask);
+                step.State = StepState.Done;
+            }
+            await Task.Delay(250);
+
+            await navigator.ShowReceiptAsync(new Dictionary<string, object> { ["booking"] = await booking });
         }
-        catch (AppException e)
+        catch (BusTicketException e)
         {
-            WasRefused = true;
-            FieldError = e.Message;
+            // Seul cas d'échec possible : le siège a été pris entre-temps, ou la vente est fermée.
+            ErrorMessage = e.Message;
         }
         finally
         {

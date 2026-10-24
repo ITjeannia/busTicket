@@ -1,12 +1,12 @@
-using BusTicket.Helpers;
+using BusTicket.Core;
 using BusTicket.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace BusTicket.ViewModels;
 
-/// <summary>Maquettes 01 (normal), 01b (erreur), 01c (chargement).</summary>
-public partial class LoginViewModel(AuthService auth, Navigator navigator) : ObservableObject
+/// <summary>Connexion par e-mail ou téléphone. Compte de démonstration : jean.dupont@mail.com / voyage123.</summary>
+public partial class LoginViewModel(Backend backend, BookingRepository bookings, Navigator navigator) : ObservableObject
 {
     [ObservableProperty] public partial string Identifier { get; set; } = "";
     [ObservableProperty] public partial string Password { get; set; } = "";
@@ -19,25 +19,36 @@ public partial class LoginViewModel(AuthService auth, Navigator navigator) : Obs
 
     public bool IsIdle => !IsLoading;
 
+    /// <summary>Déclenche la secousse du formulaire (voir LoginPage).</summary>
+    public event EventHandler? Failed;
+
+    partial void OnIdentifierChanged(string value) => IdentifierError = null;
+    partial void OnPasswordChanged(string value) => PasswordError = null;
+
     [RelayCommand]
     private async Task LoginAsync()
     {
         IdentifierError = Validators.EmailOrPhone(Identifier);
         PasswordError = Validators.Required(Password);
         BannerError = null;
-        if (IdentifierError is not null || PasswordError is not null) return;
+        if (IdentifierError is not null || PasswordError is not null)
+        {
+            Failed?.Invoke(this, EventArgs.Empty);
+            return;
+        }
 
         IsLoading = true;
         try
         {
-            await auth.LoginAsync(Identifier.Trim(), Password);
+            await backend.LoginAsync(Identifier.Trim(), Password);
             Password = "";
+            _ = bookings.RefreshAsync();
             await navigator.GoToAsync(Routes.Search);
         }
-        catch (AppException e)
+        catch (BusTicketException e)
         {
             BannerError = e.Message;
-            PasswordError = "Mot de passe incorrect";
+            Failed?.Invoke(this, EventArgs.Empty);
         }
         finally
         {
@@ -45,9 +56,19 @@ public partial class LoginViewModel(AuthService auth, Navigator navigator) : Obs
         }
     }
 
+    /// <summary>Remplit le compte de démonstration.</summary>
+    [RelayCommand]
+    private void UseDemoAccount()
+    {
+        Identifier = BookingEngine.DemoEmail;
+        Password = BookingEngine.DemoPassword;
+    }
+
     [RelayCommand]
     private Task GoToRegisterAsync() => navigator.GoToAsync(Routes.Register);
 
     [RelayCommand]
-    private Task ForgotPasswordAsync() => navigator.InfoAsync(Navigator.ComingSoon);
+    private Task ForgotPasswordAsync() => navigator.InfoAsync(
+        "Contactez le service client BusTicket au +237 6 99 00 00 00 pour réinitialiser votre mot de passe.",
+        "Mot de passe oublié");
 }

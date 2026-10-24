@@ -16,7 +16,7 @@
        x:Class="BusTicket.AppShell"
        Shell.FlyoutBehavior="Disabled"
        Shell.NavBarHasShadow="False"
-       Shell.BackgroundColor="{x:Static t:AppColors.Background}"
+       Shell.BackgroundColor="{x:Static t:AppColors.Surface}"
        Shell.ForegroundColor="{x:Static t:AppColors.TextPrimary}"
        Shell.TitleColor="{x:Static t:AppColors.TextPrimary}"
        Shell.TabBarBackgroundColor="{x:Static t:AppColors.Surface}"

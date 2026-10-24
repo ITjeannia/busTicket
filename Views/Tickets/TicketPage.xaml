@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Maquettes 08 (billet valide avec QR code) et 08b (billet expiré). -->
+<!-- Billet : trajet, QR code signé à présenter, téléchargement PDF et partage. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:c="clr-namespace:BusTicket.Controls"
@@ -11,70 +11,131 @@
              Title="Mon billet"
              Shell.TabBarIsVisible="False">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="16">
-            <c:AlertBanner Kind="Error" Message="{Binding ExpiredMessage}" />
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="16">
+                <c:AlertBanner Kind="Error" Message="{Binding ExpiredMessage}" />
+                <c:AlertBanner Kind="Info" Icon="{x:Static h:MaterialIcons.DoneAll}" Message="{Binding BoardedMessage}" />
 
-            <!-- Le billet -->
-            <Border Stroke="{x:Static t:AppColors.Border}" StrokeShape="RoundRectangle 12" Padding="0">
-                <VerticalStackLayout>
-                    <VerticalStackLayout Padding="16" Spacing="4" BackgroundColor="{x:Static t:AppColors.Primary}">
-                        <VerticalStackLayout.Triggers>
-                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding IsExpired}" Value="True">
-                                <Setter Property="BackgroundColor" Value="{x:Static t:AppColors.Disabled}" />
-                            </DataTrigger>
-                        </VerticalStackLayout.Triggers>
-                        <Label Text="{Binding Route}" Style="{StaticResource TicketHeader}" FontSize="20" FontFamily="RobotoBold">
-                            <Label.Triggers>
-                                <DataTrigger TargetType="Label" Binding="{Binding IsExpired}" Value="True">
-                                    <Setter Property="TextColor" Value="{x:Static t:AppColors.TextPrimary}" />
-                                </DataTrigger>
-                            </Label.Triggers>
-                        </Label>
-                        <Label Text="{Binding DateLine}" Style="{StaticResource TicketHeader}" FontSize="14">
-                            <Label.Triggers>
-                                <DataTrigger TargetType="Label" Binding="{Binding IsExpired}" Value="True">
-                                    <Setter Property="TextColor" Value="{x:Static t:AppColors.TextPrimary}" />
-                                </DataTrigger>
-                            </Label.Triggers>
-                        </Label>
-                    </VerticalStackLayout>
+                <!-- Le billet -->
+                <Grid x:Name="TicketCard" c:Motion.Entrance="FadeUp">
+                    <Border StrokeShape="RoundRectangle 10" Stroke="{x:Static t:AppColors.Divider}" BackgroundColor="White" Padding="0">
+                        <Border.Shadow>
+                            <Shadow Brush="#1565C0" Opacity="0.10" Radius="16" Offset="0,6" />
+                        </Border.Shadow>
+                        <VerticalStackLayout>
+                            <!-- En-tête : trajet -->
+                            <Grid Padding="18,16,18,18" BackgroundColor="{x:Static t:AppColors.Primary}" RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
+                                <Grid.Triggers>
+                                    <DataTrigger TargetType="Grid" Binding="{Binding IsValid}" Value="False">
+                                        <Setter Property="BackgroundColor" Value="#78909C" />
+                                    </DataTrigger>
+                                </Grid.Triggers>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Label Text="{x:Static h:MaterialIcons.BusFilled}" Style="{StaticResource Icon}" FontSize="18" TextColor="White" />
+                                        <Label Text="{Binding Company}" FontFamily="RobotoMedium" FontSize="14" TextColor="White" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <Label Grid.Column="1" Text="{Binding ServiceClass}" Style="{StaticResource OnPrimaryMuted}" FontSize="12"
+                                           FontFamily="RobotoMedium" VerticalOptions="Center" />
+                                </Grid>
+                                <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding DepartureTime}" FontFamily="RobotoBold" FontSize="30" TextColor="White" />
+                                        <Label Text="{Binding From}" Style="{StaticResource OnPrimaryMuted}" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{x:Static h:MaterialIcons.ArrowForward}" Style="{StaticResource Icon}" TextColor="White" FontSize="20" />
+                                        <Label Text="{Binding DurationText}" Style="{StaticResource OnPrimaryMuted}" FontSize="11" HorizontalOptions="Center" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="2">
+                                        <Label Text="{Binding ArrivalTime}" FontFamily="RobotoBold" FontSize="30" TextColor="White" HorizontalOptions="End" />
+                                        <Label Text="{Binding To}" Style="{StaticResource OnPrimaryMuted}" HorizontalOptions="End" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                                <Label Grid.Row="2" Text="{Binding DateLine}" FontFamily="RobotoMedium" FontSize="14" TextColor="White" />
+                            </Grid>
 
-                    <VerticalStackLayout Padding="16" Spacing="16">
-                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="12">
-                            <VerticalStackLayout>
-                                <Label Text="Passager" Style="{StaticResource Caption}" />
-                                <Label Text="{Binding Passenger}" Style="{StaticResource Subtitle}" />
+                            <!-- Détails -->
+                            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" RowSpacing="14" ColumnSpacing="8" Padding="18,16">
+                                <VerticalStackLayout Grid.ColumnSpan="2">
+                                    <Label Text="Passager" Style="{StaticResource Overline}" />
+                                    <Label Text="{Binding Passenger}" Style="{StaticResource Value}" LineBreakMode="TailTruncation" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="2">
+                                    <Label Text="{Binding SeatLabel}" Style="{StaticResource Overline}" />
+                                    <Label Text="{Binding SeatValue}" Style="{StaticResource Value}" FontFamily="RobotoBold" FontSize="18"
+                                           TextColor="{x:Static t:AppColors.Primary}" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Row="1">
+                                    <Label Text="Référence" Style="{StaticResource Overline}" />
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Label Text="{Binding Reference}" Style="{StaticResource Value}" FontSize="15" />
+                                        <Label Text="{x:Static h:MaterialIcons.Copy}" Style="{StaticResource Icon}" FontSize="14" />
+                                        <HorizontalStackLayout.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding CopyReferenceCommand}" />
+                                        </HorizontalStackLayout.GestureRecognizers>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Row="1" Grid.Column="1">
+                                    <Label Text="Prix payé" Style="{StaticResource Overline}" />
+                                    <Label Text="{Binding TotalText}" Style="{StaticResource Value}" FontSize="15" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Row="1" Grid.Column="2">
+                                    <Label Text="Statut" Style="{StaticResource Overline}" />
+                                    <c:StatusChip Kind="Valid" IsVisible="{Binding IsValid}" />
+                                    <c:StatusChip Kind="Boarded" IsVisible="{Binding IsBoarded}" />
+                                    <c:StatusChip Kind="Expired" IsVisible="{Binding IsExpired}" />
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <!-- Perforation -->
+                            <c:DashedLine x:Name="Perforation" Margin="18,0" />
+
+                            <!-- QR code -->
+                            <VerticalStackLayout Padding="18,18,18,20" Spacing="10">
+                                <Border x:Name="QrFrame" StrokeShape="RoundRectangle 8" Stroke="{x:Static t:AppColors.Divider}"
+                                        Padding="14" HorizontalOptions="Center" BackgroundColor="White">
+                                    <Image Source="{Binding QrCode}" WidthRequest="196" HeightRequest="196"
+                                           SemanticProperties.Description="QR code du billet" />
+                                </Border>
+                                <Label Text="{Binding CodeCaption}" Style="{StaticResource Value}" FontSize="14" HorizontalOptions="Center" />
+                                <Label Text="{Binding BoardingText}" Style="{StaticResource Small}" HorizontalOptions="Center"
+                                       IsVisible="{Binding IsValid}" />
                             </VerticalStackLayout>
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label Text="Compagnie" Style="{StaticResource Caption}" />
-                                <Label Text="{Binding Company}" Style="{StaticResource Subtitle}" />
-                            </VerticalStackLayout>
-                            <VerticalStackLayout Grid.Row="1">
-                                <Label Text="{Binding SeatLabel}" Style="{StaticResource Caption}" />
-                                <Label Text="{Binding SeatValue}" Style="{StaticResource Subtitle}" />
-                            </VerticalStackLayout>
-                            <VerticalStackLayout Grid.Row="1" Grid.Column="1">
-                                <Label Text="Réservation" Style="{StaticResource Caption}" />
-                                <Label Text="{Binding Reference}" Style="{StaticResource Subtitle}" />
-                            </VerticalStackLayout>
-                        </Grid>
+                        </VerticalStackLayout>
+                    </Border>
 
-                        <c:DashedLine />
+                    <!-- Encoches de la perforation (couleur du fond de page) -->
+                    <Ellipse WidthRequest="22" HeightRequest="22" Fill="{x:Static t:AppColors.Background}"
+                             HorizontalOptions="Start" VerticalOptions="Start" Margin="-11,0,0,0" x:Name="NotchLeft" />
+                    <Ellipse WidthRequest="22" HeightRequest="22" Fill="{x:Static t:AppColors.Background}"
+                             HorizontalOptions="End" VerticalOptions="Start" Margin="0,0,-11,0" x:Name="NotchRight" />
+                </Grid>
 
-                        <Image Source="{Binding QrCode}" WidthRequest="170" HeightRequest="170"
-                               HorizontalOptions="Center" SemanticProperties.Description="QR code du billet" />
-                        <Label Text="{Binding CodeCaption}" Style="{StaticResource Caption}" HorizontalOptions="Center" />
-                    </VerticalStackLayout>
-                </VerticalStackLayout>
-            </Border>
+                <Border Style="{StaticResource MutedBox}" Padding="14,12">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Label Text="{x:Static h:MaterialIcons.Receipt}" Style="{StaticResource Icon}" FontSize="20" />
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="Reçu de paiement inclus dans le PDF" Style="{StaticResource Small}" FontFamily="RobotoMedium"
+                                   TextColor="{x:Static t:AppColors.TextPrimary}" />
+                            <Label Text="{Binding PaymentText}" Style="{StaticResource Small}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
 
-            <HorizontalStackLayout HorizontalOptions="Center" Spacing="12">
-                <c:StatusChip Kind="Valid" IsVisible="{Binding IsValid}" />
-                <c:StatusChip Kind="Neutral" Text="Disponible hors ligne" Icon="{x:Static h:MaterialIcons.Download}"
-                              IsVisible="{Binding IsValid}" />
-                <c:StatusChip Kind="Expired" IsVisible="{Binding IsExpired}" />
-            </HorizontalStackLayout>
-        </VerticalStackLayout>
-    </ScrollView>
+        <Border Grid.Row="1" Style="{StaticResource BottomBar}">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                <c:AppButton Text="Télécharger le PDF" Icon="{x:Static h:MaterialIcons.Download}"
+                             LoadingText="Préparation…" IsLoading="{Binding IsBusy}"
+                             Command="{Binding DownloadCommand}" />
+                <c:AppButton Grid.Column="1" Icon="{x:Static h:MaterialIcons.Share}" Variant="Outlined" WidthRequest="54"
+                             SemanticProperties.Description="Partager" Command="{Binding ShareCommand}" />
+                <c:AppButton Grid.Column="2" Icon="{x:Static h:MaterialIcons.OpenInNew}" Variant="Outlined" WidthRequest="54"
+                             SemanticProperties.Description="Ouvrir le PDF" Command="{Binding OpenPdfCommand}" />
+            </Grid>
+        </Border>
+    </Grid>
 </ContentPage>

@@ -7,6 +7,7 @@ using BusTicket.Views.Search;
 using BusTicket.Views.Tickets;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Handlers;
+using ZXing.Net.Maui.Controls;
 
 namespace BusTicket;
 
@@ -17,6 +18,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            .UseBarcodeReader()   // scanner de QR codes (espace contrôleur)
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("Roboto-Regular.ttf", "Roboto");
@@ -38,10 +40,13 @@ public static class MauiProgram
     private static void RegisterServices(IServiceCollection services)
     {
         // Services (une seule instance pour toute l'application)
-        services.AddSingleton<AuthService>();
-        services.AddSingleton<TripService>();
+        services.AddSingleton<LocalStore>();
+        services.AddSingleton<ServerSettings>();
+        services.AddSingleton<ApiClient>();
+        services.AddSingleton<Backend>();
         services.AddSingleton<BookingRepository>();
         services.AddSingleton<SearchHistory>();
+        services.AddSingleton<TicketFiles>();
         services.AddSingleton<Navigator>();
 
         // Écrans
@@ -51,8 +56,10 @@ public static class MauiProgram
         services.AddTransient<ResultsViewModel>().AddTransient<ResultsPage>();
         services.AddTransient<SeatSelectionViewModel>().AddTransient<SeatSelectionPage>();
         services.AddTransient<PaymentViewModel>().AddTransient<PaymentPage>();
+        services.AddTransient<ReceiptViewModel>().AddTransient<ReceiptPage>();
         services.AddTransient<MyTicketsViewModel>().AddTransient<MyTicketsPage>();
         services.AddTransient<TicketViewModel>().AddTransient<TicketPage>();
+        services.AddTransient<ScannerViewModel>().AddTransient<ScannerPage>();
         services.AddTransient<ProfileViewModel>().AddTransient<ProfilePage>();
     }
 
@@ -70,8 +77,12 @@ public static class MauiProgram
 #elif WINDOWS
             handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
             handler.PlatformView.Background = null;
-            handler.PlatformView.Resources["TextControlBackgroundFocused"] =
-                new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+            // Le TextBox WinUI dessine son propre fond et un soulignement au survol / focus : on les neutralise.
+            var transparent = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+            foreach (var key in new[] { "TextControlBackgroundFocused", "TextControlBackgroundPointerOver",
+                                        "TextControlBorderBrushFocused", "TextControlBorderBrushPointerOver", "TextControlBorderBrush" })
+                handler.PlatformView.Resources[key] = transparent;
+            handler.PlatformView.Resources["TextControlBorderThemeThicknessFocused"] = new Microsoft.UI.Xaml.Thickness(0);
 #endif
         });
 

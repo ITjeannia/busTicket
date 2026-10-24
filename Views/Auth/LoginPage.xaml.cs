@@ -1,3 +1,4 @@
+using BusTicket.Controls;
 using BusTicket.ViewModels;
 
 namespace BusTicket.Views.Auth;
@@ -8,5 +9,6 @@ public partial class LoginPage : ContentPage
     {
         InitializeComponent();
         BindingContext = viewModel;
+        viewModel.Failed += async (_, _) => await Motion.ShakeAsync(Form);
     }
 }

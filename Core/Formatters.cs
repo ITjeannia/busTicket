@@ -1,4 +1,4 @@
-namespace BusTicket.Helpers;
+namespace BusTicket.Core;
 
 /// <summary>Mise en forme des dates, heures, prix et libellés en français.</summary>
 public static class Formatters
@@ -26,6 +26,9 @@ public static class Formatters
 
     /// <summary>Jeudi 8 octobre 2026</summary>
     public static string LongDate(DateTime d) => $"{Capitalize(DayName(d))} {d.Year}";
+
+    /// <summary>28 oct. 2026 à 14:32</summary>
+    public static string Timestamp(DateTime d) => $"{d.Day} {ShortMonths[d.Month - 1]} {d.Year} à {Time(d)}";
 
     /// <summary>07:30</summary>
     public static string Time(DateTime d) => d.ToString("HH:mm");

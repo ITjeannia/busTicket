@@ -1,36 +1,73 @@
-using System.Text.RegularExpressions;
-using BusTicket.Models;
+using BusTicket.Core;
 
 namespace BusTicket.Services;
 
 /// <summary>
-/// Billets de l'utilisateur et paiement (simulé).
-/// Les écrans s'abonnent à <see cref="Changed"/> pour se mettre à jour.
+/// Billets de l'utilisateur. Une copie est gardée sur le téléphone : les billets (et leur QR code)
+/// restent consultables sans réseau. Les écrans s'abonnent à <see cref="Changed"/> pour se mettre à jour.
 /// </summary>
-public partial class BookingRepository
+public class BookingRepository
 {
-    private readonly List<Booking> _bookings = MockData.InitialBookings();
+    private const string StoreName = "tickets";
+
+    private readonly Backend _backend;
+    private readonly LocalStore _store;
+    private List<BookingDto> _tickets;
+
+    public BookingRepository(Backend backend, LocalStore store)
+    {
+        _backend = backend;
+        _store = store;
+        _tickets = store.Load<List<BookingDto>>(StoreName) ?? [];
+    }
 
     public event EventHandler? Changed;
 
-    public IReadOnlyList<Booking> Upcoming => _bookings.Where(b => !b.IsExpired).ToList();
-    public IReadOnlyList<Booking> Past => _bookings.Where(b => b.IsExpired).ToList();
+    /// <summary>À venir (y compris embarqués, jusqu'à l'arrivée), du plus proche au plus lointain.</summary>
+    public IReadOnlyList<BookingDto> Upcoming => _tickets.Where(b => !b.IsExpired).OrderBy(b => b.Trip.Departure).ToList();
 
-    /// <summary>Règle de démo : un numéro qui se termine par « 000 » est refusé.</summary>
-    public async Task<Booking> PayAsync(Trip trip, IReadOnlyList<int> seats, string passengerName,
-                                        PaymentMethod method, string accountNumber)
+    public IReadOnlyList<BookingDto> Past => _tickets.Where(b => b.IsExpired).OrderByDescending(b => b.Trip.Departure).ToList();
+
+    public BookingDto? Find(string reference) => _tickets.FirstOrDefault(b => b.Reference == reference);
+
+    /// <summary>Recharge depuis le serveur (ou la base locale). En cas d'échec, on garde la copie existante.</summary>
+    public async Task RefreshAsync()
     {
-        await Task.Delay(1500);
-        if (NonDigits().Replace(accountNumber, "").EndsWith("000"))
-            throw new AppException("Solde insuffisant ou paiement non validé");
+        if (!_backend.IsLoggedIn) return;
+        try
+        {
+            var fresh = await _backend.GetBookingsAsync();
+            // On garde aussi les billets en cache absents de la réponse (achetés sur un autre mode de connexion).
+            _tickets = fresh.Concat(_tickets.Where(c => fresh.All(f => f.Reference != c.Reference))).ToList();
+            Save();
+        }
+        catch (BusTicketException)
+        {
+            // Session expirée côté serveur, etc. : la copie locale reste affichée.
+        }
+    }
 
-        var booking = new Booking($"BT-{Random.Shared.Next(10000, 99999)}", trip, seats,
-                                  passengerName, method, MockData.ServiceFee);
-        _bookings.Insert(0, booking);
-        Changed?.Invoke(this, EventArgs.Empty);
+    /// <summary>Réserve et paie. Le billet est ajouté en tête de liste et enregistré.</summary>
+    public async Task<BookingDto> BookAsync(CreateBookingRequest request)
+    {
+        var booking = await _backend.BookAsync(request);
+        _tickets.RemoveAll(b => b.Reference == booking.Reference);
+        _tickets.Insert(0, booking);
+        Save();
         return booking;
     }
 
-    [GeneratedRegex(@"\D")]
-    private static partial Regex NonDigits();
+    /// <summary>À la déconnexion : les billets d'un compte ne doivent pas apparaître dans un autre.</summary>
+    public void Clear()
+    {
+        _tickets = [];
+        _store.Delete(StoreName);
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void Save()
+    {
+        _store.Save(StoreName, _tickets);
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
 }

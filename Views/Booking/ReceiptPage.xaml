@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Paiement réussi : coche animée, reçu, accès au billet et au PDF. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:c="clr-namespace:BusTicket.Controls"
+             xmlns:h="clr-namespace:BusTicket.Helpers"
+             xmlns:t="clr-namespace:BusTicket.Theme"
+             xmlns:vm="clr-namespace:BusTicket.ViewModels"
+             x:Class="BusTicket.Views.Booking.ReceiptPage"
+             x:DataType="vm:ReceiptViewModel"
+             Title="Reçu"
+             Shell.TabBarIsVisible="False">
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding GoHomeCommand}" />
+    </Shell.BackButtonBehavior>
+
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView>
+            <VerticalStackLayout Padding="16,24,16,16" Spacing="20">
+                <!-- Coche -->
+                <Grid HorizontalOptions="Center" WidthRequest="112" HeightRequest="112">
+                    <Ellipse x:Name="Halo" Fill="{x:Static t:AppColors.SuccessSoft}" />
+                    <Border x:Name="Badge" WidthRequest="76" HeightRequest="76" StrokeThickness="0" StrokeShape="RoundRectangle 38"
+                            BackgroundColor="{x:Static t:AppColors.Success}" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label x:Name="Tick" Text="{x:Static h:MaterialIcons.Check}" Style="{StaticResource Icon}" FontSize="44"
+                               TextColor="White" />
+                    </Border>
+                </Grid>
+
+                <VerticalStackLayout Spacing="6" c:Motion.Entrance="FadeUp" c:Motion.Delay="300">
+                    <Label Text="Paiement réussi" Style="{StaticResource Headline}" HorizontalOptions="Center" />
+                    <Label Text="Votre billet est prêt. Il est aussi disponible hors ligne dans « Mes billets »."
+                           Style="{StaticResource Caption}" HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Reçu -->
+                <Border Style="{StaticResource Card}" Padding="0" c:Motion.Entrance="FadeUp" c:Motion.Delay="420">
+                    <VerticalStackLayout>
+                        <Grid ColumnDefinitions="*,Auto" Padding="16,14">
+                            <VerticalStackLayout>
+                                <Label Text="Référence" Style="{StaticResource Overline}" />
+                                <Label Text="{Binding Reference}" FontFamily="RobotoBold" FontSize="22"
+                                       TextColor="{x:Static t:AppColors.Primary}" CharacterSpacing="1" />
+                            </VerticalStackLayout>
+                            <c:StatusChip Grid.Column="1" Kind="Valid" Text="Payé" />
+                        </Grid>
+                        <BoxView Style="{StaticResource Divider}" />
+                        <VerticalStackLayout Padding="16,12" Spacing="2">
+                            <Label Text="{Binding Route}" Style="{StaticResource Value}" />
+                            <Label Text="{Binding TripLine}" Style="{StaticResource Small}" />
+                            <Label Text="{Binding Passenger}" Style="{StaticResource Small}" />
+                        </VerticalStackLayout>
+                        <c:DashedLine Margin="16,0" />
+                        <VerticalStackLayout Padding="16,8,16,12">
+                            <c:InfoRow Label="Transaction" Value="{Binding TransactionId}" />
+                            <c:InfoRow Label="Date" Value="{Binding PaidAt}" />
+                            <c:InfoRow Label="Payé avec" Value="{Binding MethodText}" />
+                            <c:InfoRow Label="Compte débité" Value="{Binding AccountText}" />
+                            <c:InfoRow Label="{Binding TicketsLabel}" Value="{Binding TicketsAmount}" />
+                            <c:InfoRow Label="Frais de service" Value="{Binding FeeText}" />
+                        </VerticalStackLayout>
+                        <Grid ColumnDefinitions="*,Auto" Padding="16,12" BackgroundColor="{x:Static t:AppColors.PrimarySoft}">
+                            <Label Text="Total payé" Style="{StaticResource Value}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{Binding TotalText}" FontFamily="RobotoBold" FontSize="20"
+                                   TextColor="{x:Static t:AppColors.Primary}" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Border Grid.Row="1" Style="{StaticResource BottomBar}">
+            <VerticalStackLayout Spacing="10">
+                <c:AppButton Text="Voir mon billet" Icon="{x:Static h:MaterialIcons.QrCode}" Command="{Binding ViewTicketCommand}" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <c:AppButton Text="Télécharger PDF" Icon="{x:Static h:MaterialIcons.Download}" Variant="Outlined"
+                                 LoadingText="Préparation…" IsLoading="{Binding IsDownloading}"
+                                 Command="{Binding DownloadCommand}" />
+                    <c:AppButton Grid.Column="1" Text="Accueil" Icon="{x:Static h:MaterialIcons.Home}" Variant="Ghost"
+                                 Command="{Binding GoHomeCommand}" />
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

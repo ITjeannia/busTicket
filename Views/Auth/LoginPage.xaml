@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Maquettes 01 (normal), 01b (erreur), 01c (chargement). -->
+<!-- Connexion : en-tête illustré + carte de formulaire. -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:c="clr-namespace:BusTicket.Controls"
              xmlns:h="clr-namespace:BusTicket.Helpers"
+             xmlns:t="clr-namespace:BusTicket.Theme"
              xmlns:vm="clr-namespace:BusTicket.ViewModels"
              x:Class="BusTicket.Views.Auth.LoginPage"
              x:DataType="vm:LoginViewModel"
@@ -11,51 +12,93 @@
 
     <Grid RowDefinitions="*,Auto">
         <ScrollView>
-            <VerticalStackLayout Padding="16,40,16,16">
-                <HorizontalStackLayout Spacing="12">
-                    <Image Source="app_logo.png" WidthRequest="48" HeightRequest="48" />
-                    <Label Text="BusTicket" Style="{StaticResource Brand}" />
-                </HorizontalStackLayout>
+            <Grid RowDefinitions="Auto,Auto">
+                <!-- En-tête bleu illustré -->
+                <Grid Style="{StaticResource HeaderBand}" RowDefinitions="Auto,Auto,Auto,Auto" Padding="20,44,20,0">
+                    <HorizontalStackLayout Spacing="10" c:Motion.Entrance="Fade">
+                        <Border WidthRequest="36" HeightRequest="36" StrokeThickness="0" StrokeShape="RoundRectangle 8"
+                                BackgroundColor="White">
+                            <Label Text="{x:Static h:MaterialIcons.BusFilled}" Style="{StaticResource Icon}" FontSize="22"
+                                   TextColor="{x:Static t:AppColors.Primary}" />
+                        </Border>
+                        <Label Text="BusTicket" Style="{StaticResource Brand}" TextColor="White" />
+                    </HorizontalStackLayout>
 
-                <Label Text="Bon retour !" Style="{StaticResource Headline}" Margin="0,32,0,12" />
-                <Label Text="Connectez-vous pour réserver et retrouver vos billets."
-                       Style="{StaticResource BodySecondary}" Margin="0,0,0,24" />
+                    <Label Grid.Row="1" Text="Voyagez partout au Cameroun" Style="{StaticResource Headline}"
+                           TextColor="White" Margin="0,24,0,6"
+                           c:Motion.Entrance="FadeUp" c:Motion.Delay="80" />
+                    <Label Grid.Row="2" Text="Réservez votre siège, payez en Mobile Money et embarquez avec votre billet sur le téléphone."
+                           Style="{StaticResource OnPrimaryMuted}" LineHeight="1.25"
+                           c:Motion.Entrance="FadeUp" c:Motion.Delay="140" />
 
-                <c:AlertBanner Kind="Error" Message="{Binding BannerError}" Margin="0,0,0,20" />
+                    <Image Grid.Row="3" Source="illus_hero.png" Aspect="AspectFit"
+                           HeightRequest="150" Margin="-20,12,-20,24"
+                           c:Motion.Entrance="SlideLeft" c:Motion.Delay="200" />
+                </Grid>
 
-                <c:AppTextField Label="E-mail ou téléphone"
-                                Placeholder="jean.dupont@mail.com"
-                                Icon="{x:Static h:MaterialIcons.Mail}"
-                                Keyboard="Email"
-                                Text="{Binding Identifier}"
-                                ErrorText="{Binding IdentifierError}"
-                                IsEnabled="{Binding IsIdle}" />
+                <!-- Formulaire -->
+                <Border Grid.Row="1" Style="{StaticResource Card}" Padding="20" Margin="16,-28,16,16"
+                        c:Motion.Entrance="FadeUp" c:Motion.Delay="160">
+                    <VerticalStackLayout x:Name="Form" Spacing="16">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Connexion" Style="{StaticResource Title}" />
+                            <Label Text="Retrouvez vos billets sur tous vos appareils." Style="{StaticResource Caption}" />
+                        </VerticalStackLayout>
 
-                <c:AppTextField Label="Mot de passe"
-                                Icon="{x:Static h:MaterialIcons.Lock}"
-                                IsPassword="True"
-                                Text="{Binding Password}"
-                                ErrorText="{Binding PasswordError}"
-                                IsEnabled="{Binding IsIdle}"
-                                Margin="0,20,0,0" />
+                        <c:AlertBanner Kind="Error" Message="{Binding BannerError}" />
 
-                <Label Text="Mot de passe oublié ?" Style="{StaticResource Link}"
-                       HorizontalOptions="End" Padding="0,16">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}" />
-                    </Label.GestureRecognizers>
-                </Label>
+                        <c:AppTextField Label="E-mail ou téléphone"
+                                        Placeholder="jean.dupont@mail.com"
+                                        Icon="{x:Static h:MaterialIcons.Mail}"
+                                        Keyboard="Email"
+                                        Text="{Binding Identifier}"
+                                        ErrorText="{Binding IdentifierError}"
+                                        IsEnabled="{Binding IsIdle}" />
 
-                <c:AppButton Text="Se connecter"
-                             LoadingText="Connexion…"
-                             IsLoading="{Binding IsLoading}"
-                             Command="{Binding LoginCommand}" />
-            </VerticalStackLayout>
+                        <c:AppTextField Label="Mot de passe"
+                                        Icon="{x:Static h:MaterialIcons.Lock}"
+                                        IsPassword="True"
+                                        Text="{Binding Password}"
+                                        ErrorText="{Binding PasswordError}"
+                                        IsEnabled="{Binding IsIdle}" />
+
+                        <Label Text="Mot de passe oublié ?" Style="{StaticResource Link}" FontSize="14"
+                               HorizontalOptions="End" Margin="0,-6,0,0">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+
+                        <c:AppButton Text="Se connecter"
+                                     Icon="{x:Static h:MaterialIcons.ArrowForward}"
+                                     LoadingText="Connexion…"
+                                     IsLoading="{Binding IsLoading}"
+                                     Command="{Binding LoginCommand}" />
+
+                        <!-- Compte de démonstration -->
+                        <Border Style="{StaticResource SoftBox}" Padding="12,10">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                <Label Text="{x:Static h:MaterialIcons.Info}" Style="{StaticResource Icon}" FontSize="18"
+                                       TextColor="{x:Static t:AppColors.Primary}" />
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                    <Label Text="Compte de démonstration" Style="{StaticResource Small}" FontFamily="RobotoMedium"
+                                           TextColor="{x:Static t:AppColors.Primary}" />
+                                    <Label Text="jean.dupont@mail.com · voyage123" Style="{StaticResource Small}" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="2" Text="Remplir" Style="{StaticResource Link}" FontSize="14" VerticalOptions="Center" />
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding UseDemoAccountCommand}" />
+                                </Grid.GestureRecognizers>
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
         </ScrollView>
 
-        <HorizontalStackLayout Grid.Row="1" HorizontalOptions="Center" Spacing="6" Padding="0,8,0,24">
-            <Label Text="Pas encore de compte ?" Style="{StaticResource BodySecondary}" />
-            <Label Text="Créer un compte" Style="{StaticResource Link}">
+        <HorizontalStackLayout Grid.Row="1" HorizontalOptions="Center" Spacing="6" Padding="0,8,0,20">
+            <Label Text="Pas encore de compte ?" Style="{StaticResource BodySecondary}" FontSize="15" />
+            <Label Text="Créer un compte" Style="{StaticResource Link}" FontSize="15">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding GoToRegisterCommand}" />
                 </Label.GestureRecognizers>

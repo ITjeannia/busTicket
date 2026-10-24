@@ -19,7 +19,8 @@ public class InfoRow : ContentView
     public InfoRow()
     {
         _label.VerticalOptions = _value.VerticalOptions = LayoutOptions.Center;
-        var row = new Grid { ColumnDefinitions = [new(GridLength.Star), new(GridLength.Auto)], Padding = new Thickness(0, 6) };
+        _label.LineBreakMode = LineBreakMode.TailTruncation;
+        var row = new Grid { ColumnDefinitions = [new(GridLength.Star), new(GridLength.Auto)], ColumnSpacing = 12, Padding = new Thickness(0, 6) };
         row.Add(_label, 0);
         row.Add(_value, 1);
         Content = row;

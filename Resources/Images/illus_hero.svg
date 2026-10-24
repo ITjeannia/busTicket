@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="170" viewBox="0 0 360 170">
+  <!-- Bus sur la route devant une ville, pensé pour un fond bleu #1565C0 -->
+  <circle cx="300" cy="44" r="20" fill="#FFD54F" opacity="0.9"/>
+  <circle cx="300" cy="44" r="30" fill="#FFD54F" opacity="0.18"/>
+  <!-- Ville -->
+  <rect x="8" y="70" width="26" height="72" fill="#2E7FD8"/>
+  <rect x="38" y="52" width="34" height="90" fill="#2A78CF"/>
+  <rect x="76" y="84" width="22" height="58" fill="#2E7FD8"/>
+  <rect x="228" y="62" width="30" height="80" fill="#2A78CF"/>
+  <rect x="262" y="88" width="24" height="54" fill="#2E7FD8"/>
+  <rect x="290" y="74" width="34" height="68" fill="#2A78CF"/>
+  <rect x="328" y="96" width="26" height="46" fill="#2E7FD8"/>
+  <g fill="#5A9BE3" opacity="0.8">
+    <rect x="44" y="60" width="6" height="6"/><rect x="58" y="60" width="6" height="6"/>
+    <rect x="44" y="74" width="6" height="6"/><rect x="58" y="74" width="6" height="6"/>
+    <rect x="44" y="88" width="6" height="6"/><rect x="58" y="88" width="6" height="6"/>
+    <rect x="234" y="70" width="6" height="6"/><rect x="246" y="70" width="6" height="6"/>
+    <rect x="234" y="84" width="6" height="6"/><rect x="246" y="84" width="6" height="6"/>
+    <rect x="296" y="82" width="6" height="6"/><rect x="310" y="82" width="6" height="6"/>
+    <rect x="296" y="96" width="6" height="6"/><rect x="310" y="96" width="6" height="6"/>
+  </g>
+  <!-- Palmier -->
+  <rect x="196" y="96" width="4" height="46" fill="#0F55A8"/>
+  <path d="M198 96 C186 88 176 92 170 98 C182 94 190 96 198 100 Z" fill="#0F55A8"/>
+  <path d="M198 96 C210 86 222 90 228 98 C216 93 206 96 198 100 Z" fill="#0F55A8"/>
+  <path d="M198 96 C196 84 202 76 210 74 C204 82 202 90 200 99 Z" fill="#0F55A8"/>
+  <!-- Route -->
+  <rect x="0" y="142" width="360" height="28" fill="#0D47A1"/>
+  <g fill="#FFFFFF" opacity="0.55">
+    <rect x="10" y="154" width="26" height="4" rx="2"/><rect x="60" y="154" width="26" height="4" rx="2"/>
+    <rect x="270" y="154" width="26" height="4" rx="2"/><rect x="320" y="154" width="26" height="4" rx="2"/>
+  </g>
+  <!-- Traits de vitesse -->
+  <g fill="#FFFFFF" opacity="0.5">
+    <rect x="40" y="96" width="38" height="3" rx="1.5"/>
+    <rect x="28" y="110" width="50" height="3" rx="1.5"/>
+    <rect x="48" y="124" width="30" height="3" rx="1.5"/>
+  </g>
+  <!-- Bus -->
+  <rect x="88" y="74" width="178" height="68" rx="10" fill="#FFFFFF"/>
+  <rect x="88" y="120" width="178" height="8" fill="#1565C0"/>
+  <path d="M244 82 H258 A6 6 0 0 1 264 88 V112 H244 Z" fill="#BBDEFB"/>
+  <g fill="#BBDEFB">
+    <rect x="98" y="84" width="28" height="26" rx="3"/>
+    <rect x="132" y="84" width="28" height="26" rx="3"/>
+    <rect x="166" y="84" width="28" height="26" rx="3"/>
+  </g>
+  <rect x="202" y="84" width="34" height="44" rx="3" fill="#E3F2FD" stroke="#90CAF9" stroke-width="2"/>
+  <rect x="218" y="86" width="2" height="40" fill="#90CAF9"/>
+  <rect x="258" y="116" width="8" height="6" rx="2" fill="#FFD54F"/>
+  <rect x="84" y="114" width="6" height="8" rx="2" fill="#EF5350"/>
+  <circle cx="122" cy="142" r="13" fill="#263238"/>
+  <circle cx="122" cy="142" r="5" fill="#B0BEC5"/>
+  <circle cx="230" cy="142" r="13" fill="#263238"/>
+  <circle cx="230" cy="142" r="5" fill="#B0BEC5"/>
+</svg>

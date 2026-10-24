@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="BusTicket.csproj" />
+  <Folder Name="/Core/">
+    <Project Path="Core/BusTicket.Core.csproj" />
+  </Folder>
+  <Folder Name="/Server/">
+    <Project Path="Server/BusTicket.Api.csproj" />
+  </Folder>
+</Solution>
