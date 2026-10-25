@@ -58,7 +58,7 @@ public partial class ProfileViewModel : ObservableObject
     {
         ServerUrl = _server.BaseUrl;
         IsOnline = !_backend.IsOffline;
-        ServerStatus = IsOnline ? "Connecté au serveur" : "Hors ligne · données locales";
+        ServerStatus = IsOnline ? "En ligne" : "Hors ligne";
     }
 
     [RelayCommand]

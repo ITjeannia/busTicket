@@ -66,7 +66,7 @@
 
                         <!-- Raccourcis de date -->
                         <HorizontalStackLayout Spacing="8">
-                            <Border StrokeShape="RoundRectangle 4" Padding="12,6" Stroke="{x:Static t:AppColors.Divider}"
+                            <Border StrokeShape="RoundRectangle 6" Padding="16,0" HeightRequest="36" Stroke="{x:Static t:AppColors.Border}"
                                     BackgroundColor="White">
                                 <Border.Triggers>
                                     <DataTrigger TargetType="Border" Binding="{Binding IsToday}" Value="True">
@@ -74,12 +74,12 @@
                                         <Setter Property="Stroke" Value="{x:Static t:AppColors.Primary}" />
                                     </DataTrigger>
                                 </Border.Triggers>
-                                <Label Text="Aujourd'hui" Style="{StaticResource Small}" FontFamily="RobotoMedium" />
+                                <Label Text="Aujourd'hui" Style="{StaticResource Caption}" FontFamily="RobotoMedium" VerticalOptions="Center" />
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SetTodayCommand}" />
                                 </Border.GestureRecognizers>
                             </Border>
-                            <Border StrokeShape="RoundRectangle 4" Padding="12,6" Stroke="{x:Static t:AppColors.Divider}"
+                            <Border StrokeShape="RoundRectangle 6" Padding="16,0" HeightRequest="36" Stroke="{x:Static t:AppColors.Border}"
                                     BackgroundColor="White">
                                 <Border.Triggers>
                                     <DataTrigger TargetType="Border" Binding="{Binding IsTomorrow}" Value="True">
@@ -87,7 +87,7 @@
                                         <Setter Property="Stroke" Value="{x:Static t:AppColors.Primary}" />
                                     </DataTrigger>
                                 </Border.Triggers>
-                                <Label Text="Demain" Style="{StaticResource Small}" FontFamily="RobotoMedium" />
+                                <Label Text="Demain" Style="{StaticResource Caption}" FontFamily="RobotoMedium" VerticalOptions="Center" />
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding SetTomorrowCommand}" />
                                 </Border.GestureRecognizers>
@@ -132,7 +132,7 @@
                     <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="s:RecentSearch">
                             <Border StrokeShape="RoundRectangle 6" Stroke="{x:Static t:AppColors.Divider}" BackgroundColor="White"
-                                    Padding="12,8" Margin="0,0,8,8" c:Motion.Entrance="Pop" c:Motion.Delay="120">
+                                    Padding="12,10" Margin="0,0,8,8" c:Motion.Entrance="Pop" c:Motion.Delay="120">
                                 <HorizontalStackLayout Spacing="6">
                                     <Label Text="{x:Static h:MaterialIcons.Bus}" Style="{StaticResource Icon}" FontSize="16"
                                            TextColor="{x:Static t:AppColors.Primary}" />

@@ -33,6 +33,10 @@ public static class Formatters
     /// <summary>07:30</summary>
     public static string Time(DateTime d) => d.ToString("HH:mm");
 
+    /// <summary>« 21:00 → 01:15 (+1 j) » : le « +1 j » signale une arrivée le lendemain.</summary>
+    public static string TimeRange(DateTime departure, DateTime arrival) =>
+        $"{Time(departure)} → {Time(arrival)}{(arrival.Date > departure.Date ? " (+1 j)" : "")}";
+
     /// <summary>5 h 15</summary>
     public static string Duration(TimeSpan d) => $"{(int)d.TotalHours} h {d.Minutes:00}";
 

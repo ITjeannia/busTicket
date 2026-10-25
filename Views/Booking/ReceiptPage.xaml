@@ -74,7 +74,7 @@
             <VerticalStackLayout Spacing="10">
                 <c:AppButton Text="Voir mon billet" Icon="{x:Static h:MaterialIcons.QrCode}" Command="{Binding ViewTicketCommand}" />
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                    <c:AppButton Text="Télécharger PDF" Icon="{x:Static h:MaterialIcons.Download}" Variant="Outlined"
+                    <c:AppButton Text="PDF" Icon="{x:Static h:MaterialIcons.Download}" Variant="Outlined"
                                  LoadingText="Préparation…" IsLoading="{Binding IsDownloading}"
                                  Command="{Binding DownloadCommand}" />
                     <c:AppButton Grid.Column="1" Text="Accueil" Icon="{x:Static h:MaterialIcons.Home}" Variant="Ghost"

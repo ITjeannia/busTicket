@@ -30,7 +30,8 @@ public class AppDateField : ContentView
         picker.SetBinding(DatePicker.DateProperty, new Binding(nameof(Date), BindingMode.TwoWay, source: this));
 
         var row = new Grid { ColumnDefinitions = [new(GridLength.Auto), new(GridLength.Star)], ColumnSpacing = 12 };
-        row.Add(Ui.Icon(MaterialIcons.Calendar), 0);
+        // Sous Windows, le sélecteur affiche déjà une icône de calendrier : pas de doublon.
+        if (DeviceInfo.Platform != DevicePlatform.WinUI) row.Add(Ui.Icon(MaterialIcons.Calendar), 0);
         row.Add(picker, 1);
 
         var box = new Border

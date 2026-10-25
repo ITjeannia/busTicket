@@ -29,16 +29,16 @@
             <Border Style="{StaticResource Card}" Padding="16" c:Motion.Entrance="FadeUp" c:Motion.Delay="80">
                 <VerticalStackLayout Spacing="16">
                     <Label Text="Identité" Style="{StaticResource Overline}" />
-                    <c:AppTextField Label="Nom complet" Placeholder="Jean Dupont"
+                    <c:AppTextField Label="Nom complet" Placeholder="Prénom et nom" ReturnType="Next"
                                     Icon="{x:Static h:MaterialIcons.Person}"
                                     Text="{Binding FullName}" ErrorText="{Binding FullNameError}"
                                     HelperText="Tel qu'il figure sur votre pièce d'identité" />
 
-                    <c:AppTextField Label="E-mail" Placeholder="jean.dupont@mail.com" Keyboard="Email"
+                    <c:AppTextField Label="E-mail" Placeholder="nom@exemple.com" Keyboard="Email" ReturnType="Next"
                                     Icon="{x:Static h:MaterialIcons.Mail}"
                                     Text="{Binding Email}" ErrorText="{Binding EmailError}" />
 
-                    <c:AppTextField Label="Téléphone" Placeholder="+237 6 XX XX XX XX" Keyboard="Telephone"
+                    <c:AppTextField Label="Téléphone" Placeholder="6XX XX XX XX" Keyboard="Telephone" ReturnType="Next"
                                     Icon="{x:Static h:MaterialIcons.Phone}"
                                     Text="{Binding Phone}" ErrorText="{Binding PhoneError}" />
                 </VerticalStackLayout>
@@ -47,12 +47,12 @@
             <Border Style="{StaticResource Card}" Padding="16" c:Motion.Entrance="FadeUp" c:Motion.Delay="140">
                 <VerticalStackLayout Spacing="16">
                     <Label Text="Sécurité" Style="{StaticResource Overline}" />
-                    <c:AppTextField Label="Mot de passe" IsPassword="True"
+                    <c:AppTextField Label="Mot de passe" IsPassword="True" ReturnType="Next"
                                     Icon="{x:Static h:MaterialIcons.Lock}"
                                     HelperText="8 caractères minimum, dont 1 chiffre"
                                     Text="{Binding Password}" ErrorText="{Binding PasswordError}" />
 
-                    <c:AppTextField Label="Confirmer le mot de passe" Placeholder="Ressaisir le mot de passe" IsPassword="True"
+                    <c:AppTextField Label="Confirmer le mot de passe" Placeholder="Ressaisir le mot de passe" IsPassword="True" ReturnType="Done"
                                     Icon="{x:Static h:MaterialIcons.Lock}"
                                     Text="{Binding Confirm}" ErrorText="{Binding ConfirmError}" />
                 </VerticalStackLayout>

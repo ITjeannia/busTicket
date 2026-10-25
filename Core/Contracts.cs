@@ -65,6 +65,8 @@ public sealed record TripDto(
     [JsonIgnore] public int AvailableSeats => TotalSeats - BookedSeats.Count;
     [JsonIgnore] public bool IsFull => AvailableSeats <= 0;
     [JsonIgnore] public bool IsVip => ServiceClass == Catalog.Vip;
+    /// <summary>Départ de nuit : le bus arrive le lendemain.</summary>
+    [JsonIgnore] public bool ArrivesNextDay => Arrival.Date > Departure.Date;
     [JsonIgnore] public string Route => $"{From} → {To}";
 
     [JsonIgnore]

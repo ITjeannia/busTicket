@@ -33,7 +33,6 @@ public partial class MyTicketsViewModel : ObservableObject
 
     public bool HasTickets => !IsEmpty;
     public bool IsUpcoming => SelectedTab == 0;
-    public string? InfoMessage => IsUpcoming ? "Vos billets restent disponibles sans connexion internet." : null;
     public string EmptyTitle => IsUpcoming ? "Aucun billet à venir" : "Aucun billet passé";
     public string EmptyMessage => IsUpcoming
         ? "Réservez votre prochain trajet en quelques étapes. Vos billets apparaîtront ici, même hors connexion."
@@ -53,7 +52,6 @@ public partial class MyTicketsViewModel : ObservableObject
         IsEmpty = Tickets.Count == 0;
         CountText = $"{_bookings.Upcoming.Count} à venir · {_bookings.Past.Count} passé{(_bookings.Past.Count > 1 ? "s" : "")}";
         OnPropertyChanged(nameof(IsUpcoming));
-        OnPropertyChanged(nameof(InfoMessage));
         OnPropertyChanged(nameof(EmptyTitle));
         OnPropertyChanged(nameof(EmptyMessage));
         OnPropertyChanged(nameof(EmptyActionText));

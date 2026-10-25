@@ -18,7 +18,8 @@ public partial class SeatSelectionViewModel(Backend backend, Navigator navigator
 
     [ObservableProperty] public partial string Route { get; set; } = "";
     [ObservableProperty] public partial string TripInfo { get; set; } = "";
-    [ObservableProperty] public partial string ClassText { get; set; } = "";
+    /// <summary>« Général Express · Classique »</summary>
+    [ObservableProperty] public partial string CompanyLine { get; set; } = "";
     [ObservableProperty] public partial string Summary { get; set; } = "";
     [ObservableProperty] public partial string PriceText { get; set; } = "";
     [ObservableProperty] public partial string AvailabilityText { get; set; } = "";
@@ -34,8 +35,8 @@ public partial class SeatSelectionViewModel(Backend backend, Navigator navigator
         _trip = (TripDto)query["trip"];
         _passengers = (int)query["passengers"];
         Route = _trip.Route;
-        TripInfo = $"{Formatters.ShortDate(_trip.Departure)} · {Formatters.Time(_trip.Departure)} → {Formatters.Time(_trip.Arrival)} · {_trip.Company}";
-        ClassText = _trip.ServiceClass;
+        TripInfo = $"{Formatters.ShortDate(_trip.Departure)} · {Formatters.TimeRange(_trip.Departure, _trip.Arrival)}";
+        CompanyLine = $"{_trip.Company} · {_trip.ServiceClass}";
         IsVip = _trip.IsVip;
         BuildPlan(_trip);
         _ = RefreshSeatsAsync();

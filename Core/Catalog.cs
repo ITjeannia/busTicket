@@ -57,6 +57,18 @@ public static class Catalog
     private static readonly IReadOnlyList<string> ClassicAmenities = ["Climatisation", "Bagage 20 kg"];
     private static readonly IReadOnlyList<string> VipAmenities = ["Climatisation", "Wi-Fi", "Prises USB", "Collation", "Bagage 30 kg"];
 
+    /// <summary>
+    /// Adresses exactes des agences, quand on les connaît (compagnie, ville, quartier, coordonnées GPS).
+    /// Une agence absente de cette liste est cherchée par son nom dans Google Maps.
+    /// Exemple : new("Buca Voyages", "Douala", "Akwa, boulevard de la Liberté", 4.0469, 9.6993),
+    /// </summary>
+    private static readonly Agency[] KnownAgencies = [];
+
+    /// <summary>Agence d'où part le bus d'une compagnie dans une ville.</summary>
+    public static Agency AgencyFor(string company, string city) =>
+        KnownAgencies.FirstOrDefault(a => a.Company == company && a.City == city)
+        ?? new Agency(company, city, null, null, null);
+
     public static bool IsCity(string? name) => CityList.Any(c => c.Name == name);
 
     /// <summary>Départs d'une journée, dans l'ordre. Sans les sièges vendus par BusTicket (voir BookingEngine).</summary>
@@ -152,6 +164,30 @@ public static class Catalog
             var hash = 2166136261;
             foreach (var c in s) hash = (hash ^ c) * 16777619;
             return (int)hash;
+        }
+    }
+}
+
+/// <summary>
+/// Agence d'une compagnie dans une ville. Sans coordonnées connues, l'itinéraire Google Maps
+/// cherche l'agence par son nom (« Buca Voyages, Douala, Cameroun »).
+/// </summary>
+public sealed record Agency(string Company, string City, string? Address, double? Lat, double? Lon)
+{
+    public string Name => $"Agence {Company}";
+
+    /// <summary>« Akwa, boulevard de la Liberté · Douala », ou la ville seule.</summary>
+    public string Place => Address is null ? City : $"{Address} · {City}";
+
+    /// <summary>Lien d'itinéraire Google Maps : ouvre l'application si elle est installée, sinon le navigateur.</summary>
+    public string DirectionsUrl
+    {
+        get
+        {
+            var destination = Lat is { } lat && Lon is { } lon
+                ? string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{lat},{lon}")
+                : $"{Company}, {City}, Cameroun";
+            return $"https://www.google.com/maps/dir/?api=1&destination={Uri.EscapeDataString(destination)}";
         }
     }
 }

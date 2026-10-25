@@ -57,15 +57,46 @@
 
                             <VerticalStackLayout>
                                 <VerticalStackLayout Padding="16,14,16,12" Spacing="12">
-                                    <!-- Compagnie, classe, prix -->
-                                    <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8">
-                                        <Label Text="{Binding Company}" Style="{StaticResource Value}" FontSize="15" VerticalOptions="Center" />
-                                        <c:StatusChip Grid.Column="1" Kind="Info" Text="VIP" Icon="{x:Static h:MaterialIcons.Star}"
-                                                      IsVisible="{Binding IsVip}" />
-                                        <c:StatusChip Grid.Column="1" Kind="Neutral" Text="{Binding ServiceClass}"
-                                                      IsVisible="{Binding IsClassic}" />
-                                        <Label Grid.Column="3" Text="{Binding PriceText}" Style="{StaticResource TripTime}" FontSize="18"
-                                               TextColor="{x:Static t:AppColors.Primary}" />
+                                    <!-- Compagnie et classe à gauche ; prix et places restantes à droite -->
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                        <VerticalStackLayout Spacing="6">
+                                            <Label Text="{Binding Company}" Style="{StaticResource Value}" FontSize="15"
+                                                   LineBreakMode="TailTruncation" />
+                                            <HorizontalStackLayout>
+                                                <c:StatusChip Kind="Info" Text="VIP" Icon="{x:Static h:MaterialIcons.Star}"
+                                                              IsVisible="{Binding IsVip}" />
+                                                <c:StatusChip Kind="Neutral" Text="{Binding ServiceClass}"
+                                                              IsVisible="{Binding IsClassic}" />
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                            <Label Text="{Binding PriceText}" Style="{StaticResource TripTime}" FontSize="18"
+                                                   TextColor="{x:Static t:AppColors.Primary}" HorizontalOptions="End" />
+                                            <HorizontalStackLayout Spacing="4" HorizontalOptions="End">
+                                                <Label Text="{x:Static h:MaterialIcons.Seat}" Style="{StaticResource Icon}" FontSize="15"
+                                                       TextColor="{x:Static t:AppColors.Success}">
+                                                    <Label.Triggers>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding IsAlmostFull}" Value="True">
+                                                            <Setter Property="TextColor" Value="{x:Static t:AppColors.Warning}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding IsFull}" Value="True">
+                                                            <Setter Property="TextColor" Value="{x:Static t:AppColors.TextSecondary}" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                                <Label Text="{Binding SeatsText}" Style="{StaticResource Small}" FontFamily="RobotoMedium"
+                                                       TextColor="{x:Static t:AppColors.Success}" VerticalOptions="Center">
+                                                    <Label.Triggers>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding IsAlmostFull}" Value="True">
+                                                            <Setter Property="TextColor" Value="{x:Static t:AppColors.Warning}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding IsFull}" Value="True">
+                                                            <Setter Property="TextColor" Value="{x:Static t:AppColors.TextSecondary}" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
                                     </Grid>
 
                                     <!-- Horaires -->
@@ -87,46 +118,31 @@
                                             <Label Grid.Row="2" Text="{Binding StopsText}" Style="{StaticResource Small}" HorizontalOptions="Center" />
                                         </Grid>
                                         <VerticalStackLayout Grid.Column="2">
-                                            <Label Text="{Binding ArrivalTime}" Style="{StaticResource TripTime}" HorizontalOptions="End" />
+                                            <HorizontalStackLayout HorizontalOptions="End" Spacing="2">
+                                                <Label Text="{Binding ArrivalTime}" Style="{StaticResource TripTime}" />
+                                                <Label Text="+1 j" Style="{StaticResource Small}" FontFamily="RobotoMedium"
+                                                       TextColor="{x:Static t:AppColors.Warning}" VerticalOptions="Start"
+                                                       IsVisible="{Binding ArrivesNextDay}"
+                                                       SemanticProperties.Description="Arrivée le lendemain" />
+                                            </HorizontalStackLayout>
                                             <Label Text="{Binding To}" Style="{StaticResource Small}" HorizontalOptions="End" />
                                         </VerticalStackLayout>
                                     </Grid>
                                 </VerticalStackLayout>
 
-                                <!-- Équipements et places -->
-                                <Grid ColumnDefinitions="*,Auto" Padding="16,10" BackgroundColor="{x:Static t:AppColors.SurfaceMuted}">
-                                    <HorizontalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding AmenityIcons}">
-                                        <BindableLayout.ItemTemplate>
-                                            <DataTemplate x:DataType="x:String">
-                                                <Label Text="{Binding .}" Style="{StaticResource Icon}" FontSize="17" />
-                                            </DataTemplate>
-                                        </BindableLayout.ItemTemplate>
-                                    </HorizontalStackLayout>
-                                    <HorizontalStackLayout Grid.Column="1" Spacing="4">
-                                        <Label Text="{x:Static h:MaterialIcons.Seat}" Style="{StaticResource Icon}" FontSize="16"
-                                               TextColor="{x:Static t:AppColors.Success}">
-                                            <Label.Triggers>
-                                                <DataTrigger TargetType="Label" Binding="{Binding IsAlmostFull}" Value="True">
-                                                    <Setter Property="TextColor" Value="{x:Static t:AppColors.Warning}" />
-                                                </DataTrigger>
-                                                <DataTrigger TargetType="Label" Binding="{Binding IsFull}" Value="True">
-                                                    <Setter Property="TextColor" Value="{x:Static t:AppColors.TextSecondary}" />
-                                                </DataTrigger>
-                                            </Label.Triggers>
-                                        </Label>
-                                        <Label Text="{Binding SeatsText}" Style="{StaticResource Small}" FontFamily="RobotoMedium"
-                                               TextColor="{x:Static t:AppColors.Success}" VerticalOptions="Center">
-                                            <Label.Triggers>
-                                                <DataTrigger TargetType="Label" Binding="{Binding IsAlmostFull}" Value="True">
-                                                    <Setter Property="TextColor" Value="{x:Static t:AppColors.Warning}" />
-                                                </DataTrigger>
-                                                <DataTrigger TargetType="Label" Binding="{Binding IsFull}" Value="True">
-                                                    <Setter Property="TextColor" Value="{x:Static t:AppColors.TextSecondary}" />
-                                                </DataTrigger>
-                                            </Label.Triggers>
-                                        </Label>
-                                    </HorizontalStackLayout>
-                                </Grid>
+                                <!-- Équipements -->
+                                <FlexLayout Wrap="Wrap" Padding="16,8,16,4" BackgroundColor="{x:Static t:AppColors.SurfaceMuted}"
+                                            BindableLayout.ItemsSource="{Binding Amenities}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="items:Amenity">
+                                            <HorizontalStackLayout Spacing="4" Margin="0,0,14,4"
+                                                                   SemanticProperties.Description="{Binding Description}">
+                                                <Label Text="{Binding Icon}" Style="{StaticResource Icon}" FontSize="15" />
+                                                <Label Text="{Binding Label}" Style="{StaticResource Small}" VerticalOptions="Center" />
+                                            </HorizontalStackLayout>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </FlexLayout>
                             </VerticalStackLayout>
                         </Border>
                     </ContentView>

@@ -57,9 +57,17 @@
                                Command="{Binding OpenScannerCommand}" />
                 </Border>
 
-                <!-- Serveur -->
-                <Label Text="Connexion" Style="{StaticResource Overline}" Margin="4,4,0,-8" />
+                <!-- Assistance -->
+                <Label Text="Assistance" Style="{StaticResource Overline}" Margin="4,4,0,-8" />
                 <Border Style="{StaticResource Card}" Padding="0" c:Motion.Entrance="FadeUp" c:Motion.Delay="160">
+                    <c:MenuRow Icon="{x:Static h:MaterialIcons.Support}" Text="Aide et contact"
+                               Subtitle="Du lundi au samedi, 6 h – 21 h"
+                               Command="{Binding HelpCommand}" />
+                </Border>
+
+                <!-- Paramètres : serveur de l'API (utile pour les tests sur téléphone) -->
+                <Label Text="Paramètres" Style="{StaticResource Overline}" Margin="4,4,0,-8" />
+                <Border Style="{StaticResource Card}" Padding="0" c:Motion.Entrance="FadeUp" c:Motion.Delay="200">
                     <VerticalStackLayout>
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" Padding="16,12">
                             <Border Style="{StaticResource IconTile}" WidthRequest="36" HeightRequest="36"
@@ -83,7 +91,8 @@
                                 <Label Text="{Binding ServerStatus}" Style="{StaticResource Value}" />
                                 <Label Text="{Binding ServerUrl}" Style="{StaticResource Small}" LineBreakMode="MiddleTruncation" />
                             </VerticalStackLayout>
-                            <Label Grid.Column="2" Text="Tester" Style="{StaticResource Link}" FontSize="14" VerticalOptions="Center">
+                            <Label Grid.Column="2" Text="Tester" Style="{StaticResource Link}" FontSize="14" VerticalOptions="Center"
+                                   Padding="12,12" Margin="-12,-12">
                                 <Label.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding TestConnectionCommand}" />
                                 </Label.GestureRecognizers>
@@ -91,20 +100,14 @@
                         </Grid>
                         <BoxView Style="{StaticResource Divider}" />
                         <c:MenuRow Icon="{x:Static h:MaterialIcons.Dns}" Text="Adresse du serveur"
-                                   Subtitle="Pour un téléphone : adresse IP du PC qui fait tourner l'API"
+                                   Subtitle="Pour les tests sur téléphone"
                                    Command="{Binding EditServerCommand}" />
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Assistance -->
-                <Label Text="Assistance" Style="{StaticResource Overline}" Margin="4,4,0,-8" />
-                <Border Style="{StaticResource Card}" Padding="0" c:Motion.Entrance="FadeUp" c:Motion.Delay="200">
-                    <VerticalStackLayout>
-                        <c:MenuRow Icon="{x:Static h:MaterialIcons.Support}" Text="Aide et contact" Command="{Binding HelpCommand}" />
-                        <BoxView Style="{StaticResource Divider}" />
-                        <c:MenuRow Icon="{x:Static h:MaterialIcons.Logout}" Text="Se déconnecter" IsDestructive="True"
-                                   Command="{Binding LogoutCommand}" />
-                    </VerticalStackLayout>
+                <Border Style="{StaticResource Card}" Padding="0" Margin="0,8,0,0" c:Motion.Entrance="FadeUp" c:Motion.Delay="240">
+                    <c:MenuRow Icon="{x:Static h:MaterialIcons.Logout}" Text="Se déconnecter" IsDestructive="True"
+                               Command="{Binding LogoutCommand}" />
                 </Border>
 
                 <Label Text="{Binding Footer}" Style="{StaticResource Small}" HorizontalTextAlignment="Center" Margin="0,8" />

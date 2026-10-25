@@ -17,6 +17,8 @@ public class AppTextField : ContentView
     public static readonly BindableProperty HelperTextProperty = Ui.Prop<AppTextField, string?>(nameof(HelperText), null, f => f.Refresh());
     public static readonly BindableProperty IsPasswordProperty = Ui.Prop<AppTextField, bool>(nameof(IsPassword), false, f => f.Refresh());
     public static readonly BindableProperty KeyboardProperty = Ui.Prop<AppTextField, Keyboard>(nameof(Keyboard), Keyboard.Default, f => f.Refresh());
+    public static readonly BindableProperty ReturnTypeProperty = Ui.Prop<AppTextField, ReturnType>(nameof(ReturnType), ReturnType.Default, f => f._entry.ReturnType = f.ReturnType);
+    public static readonly BindableProperty ReturnCommandProperty = Ui.Prop<AppTextField, System.Windows.Input.ICommand?>(nameof(ReturnCommand), null);
 
     public string Label { get => (string)GetValue(LabelProperty); set => SetValue(LabelProperty, value); }
     public string Text { get => (string)GetValue(TextProperty); set => SetValue(TextProperty, value); }
@@ -28,6 +30,10 @@ public class AppTextField : ContentView
     public string? HelperText { get => (string?)GetValue(HelperTextProperty); set => SetValue(HelperTextProperty, value); }
     public bool IsPassword { get => (bool)GetValue(IsPasswordProperty); set => SetValue(IsPasswordProperty, value); }
     public Keyboard Keyboard { get => (Keyboard)GetValue(KeyboardProperty); set => SetValue(KeyboardProperty, value); }
+    /// <summary>Touche « Entrée » du clavier : Next passe au champ suivant, Done/Go valide (voir <see cref="ReturnCommand"/>).</summary>
+    public ReturnType ReturnType { get => (ReturnType)GetValue(ReturnTypeProperty); set => SetValue(ReturnTypeProperty, value); }
+    /// <summary>Exécutée à l'appui sur « Entrée » (ex. : se connecter depuis le champ mot de passe).</summary>
+    public System.Windows.Input.ICommand? ReturnCommand { get => (System.Windows.Input.ICommand?)GetValue(ReturnCommandProperty); set => SetValue(ReturnCommandProperty, value); }
 
     private readonly Label _label = Ui.Text(size: AppFonts.Caption, font: AppFonts.Medium);
     private readonly Label _icon = Ui.Icon("");
@@ -35,21 +41,44 @@ public class AppTextField : ContentView
     private readonly Entry _entry = new() { FontFamily = AppFonts.Regular, FontSize = AppFonts.Body, VerticalOptions = LayoutOptions.Center };
     private readonly Border _box = new() { StrokeShape = Ui.Rounded(AppSpacing.RadiusSm), HeightRequest = AppSpacing.ControlHeight, Padding = new Thickness(12, 0) };
     private readonly Label _message = Ui.Text(size: AppFonts.Caption);
+    /// <summary>Œil qui affiche / masque le mot de passe.</summary>
+    private readonly Label _reveal = Ui.Icon(MaterialIcons.Visibility);
+    private bool _revealed;
 
     public AppTextField()
     {
         _entry.SetBinding(Entry.TextProperty, new Binding(nameof(Text), BindingMode.TwoWay, source: this));
         _entry.Focused += (_, _) => Refresh();
         _entry.Unfocused += (_, _) => Refresh();
+        _entry.Completed += (_, _) =>
+        {
+            if (ReturnCommand?.CanExecute(null) == true) ReturnCommand.Execute(null);
+        };
+
+        // Zone de toucher de 40 × 48 autour de l'icône.
+        _reveal.WidthRequest = 40;
+        _reveal.HeightRequest = 48;
+        _reveal.HorizontalTextAlignment = TextAlignment.Center;
+        _reveal.VerticalTextAlignment = TextAlignment.Center;
+        _reveal.Margin = new Thickness(-8, 0, -8, 0);
+        _reveal.GestureRecognizers.Add(new TapGestureRecognizer
+        {
+            Command = new Command(() =>
+            {
+                _revealed = !_revealed;
+                Refresh();
+            }),
+        });
 
         var row = new Grid
         {
-            ColumnDefinitions = [new(GridLength.Auto), new(GridLength.Star), new(GridLength.Auto)],
+            ColumnDefinitions = [new(GridLength.Auto), new(GridLength.Star), new(GridLength.Auto), new(GridLength.Auto)],
             ColumnSpacing = 12,
         };
         row.Add(_icon, 0);
         row.Add(_entry, 1);
         row.Add(_errorIcon, 2);
+        row.Add(_reveal, 3);
         _box.Content = row;
 
         Content = new VerticalStackLayout { Spacing = 6, Children = { _label, _box, _message } };
@@ -79,9 +108,18 @@ public class AppTextField : ContentView
         _errorIcon.IsVisible = hasError;
 
         _entry.Placeholder = Placeholder;
-        _entry.PlaceholderColor = AppColors.TextSecondary;
-        _entry.IsPassword = IsPassword;
+        _entry.PlaceholderColor = AppColors.TextDisabled;
+        _entry.IsPassword = IsPassword && !_revealed;
+        _reveal.IsVisible = IsPassword;
+        _reveal.Text = _revealed ? MaterialIcons.VisibilityOff : MaterialIcons.Visibility;
+        _reveal.TextColor = AppColors.TextSecondary;
+        SemanticProperties.SetDescription(_reveal, _revealed ? "Masquer le mot de passe" : "Afficher le mot de passe");
         _entry.Keyboard = Keyboard;
+        // Pas de correcteur ni de suggestions sur un e-mail, un numéro ou un mot de passe.
+        var literal = IsPassword || Keyboard == Keyboard.Email || Keyboard == Keyboard.Telephone
+                      || Keyboard == Keyboard.Numeric || Keyboard == Keyboard.Url;
+        _entry.IsSpellCheckEnabled = !literal;
+        _entry.IsTextPredictionEnabled = !literal;
         _entry.IsEnabled = IsEnabled;
         _entry.TextColor = IsEnabled ? AppColors.TextPrimary : AppColors.TextDisabled;
 

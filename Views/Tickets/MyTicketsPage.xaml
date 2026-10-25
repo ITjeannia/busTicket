@@ -33,7 +33,10 @@
                 <CollectionView.Header>
                     <VerticalStackLayout Padding="16,16,16,4" Spacing="12">
                         <c:OfflineBanner />
-                        <c:AlertBanner Kind="Info" Icon="{x:Static h:MaterialIcons.CloudDone}" Message="{Binding InfoMessage}" />
+                        <HorizontalStackLayout Spacing="6" IsVisible="{Binding IsUpcoming}">
+                            <Label Text="{x:Static h:MaterialIcons.CloudDone}" Style="{StaticResource Icon}" FontSize="16" />
+                            <Label Text="Vos billets restent disponibles sans connexion." Style="{StaticResource Small}" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
                     </VerticalStackLayout>
                 </CollectionView.Header>
                 <CollectionView.ItemTemplate>
@@ -53,8 +56,14 @@
                                             <Label Text="{Binding DateText}" Style="{StaticResource Overline}"
                                                    TextColor="{x:Static t:AppColors.Primary}" />
                                             <Label Grid.Column="1" Text="{Binding Countdown}" Style="{StaticResource Small}"
-                                                   FontFamily="RobotoMedium" TextColor="{x:Static t:AppColors.Warning}"
-                                                   IsVisible="{Binding HasCountdown}" />
+                                                   FontFamily="RobotoMedium" TextColor="{x:Static t:AppColors.Primary}"
+                                                   IsVisible="{Binding HasCountdown}">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding IsSoon}" Value="True">
+                                                        <Setter Property="TextColor" Value="{x:Static t:AppColors.Warning}" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
                                         </Grid>
                                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
                                             <VerticalStackLayout>
@@ -64,7 +73,12 @@
                                             <Label Grid.Column="1" Text="{x:Static h:MaterialIcons.ArrowForward}" Style="{StaticResource Icon}"
                                                    FontSize="16" TextColor="{x:Static t:AppColors.Disabled}" />
                                             <VerticalStackLayout Grid.Column="2">
-                                                <Label Text="{Binding ArrivalTime}" Style="{StaticResource TripTime}" FontSize="18" HorizontalOptions="End" />
+                                                <HorizontalStackLayout HorizontalOptions="End" Spacing="2">
+                                                    <Label Text="{Binding ArrivalTime}" Style="{StaticResource TripTime}" FontSize="18" />
+                                                    <Label Text="+1 j" Style="{StaticResource Small}" FontSize="10" FontFamily="RobotoMedium"
+                                                           TextColor="{x:Static t:AppColors.Warning}" VerticalOptions="Start"
+                                                           IsVisible="{Binding ArrivesNextDay}" />
+                                                </HorizontalStackLayout>
                                                 <Label Text="{Binding To}" Style="{StaticResource Small}" HorizontalOptions="End" LineBreakMode="TailTruncation" />
                                             </VerticalStackLayout>
                                         </Grid>
@@ -86,7 +100,7 @@
                                                 </DataTrigger>
                                             </Label.Triggers>
                                         </Label>
-                                        <Label Text="{Binding Reference}" Style="{StaticResource Small}" FontSize="10" FontFamily="RobotoMedium"
+                                        <Label Text="{Binding Reference}" Style="{StaticResource Small}" FontSize="11" FontFamily="RobotoMedium"
                                                HorizontalOptions="Center" />
                                         <Label Text="{Binding PriceText}" Style="{StaticResource Small}" FontSize="11"
                                                HorizontalOptions="Center" TextColor="{x:Static t:AppColors.TextPrimary}" />

@@ -18,7 +18,7 @@
             <VerticalStackLayout Padding="16" Spacing="16">
                 <!-- Rappel du trajet -->
                 <Border Style="{StaticResource Card}" Padding="14,12" c:Motion.Entrance="FadeUp">
-                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
                         <Border Style="{StaticResource IconTile}">
                             <Label Text="{x:Static h:MaterialIcons.Bus}" Style="{StaticResource Icon}"
                                    TextColor="{x:Static t:AppColors.Primary}" />
@@ -26,8 +26,8 @@
                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
                             <Label Text="{Binding Route}" Style="{StaticResource Value}" />
                             <Label Text="{Binding TripInfo}" Style="{StaticResource Small}" LineBreakMode="TailTruncation" />
+                            <Label Text="{Binding CompanyLine}" Style="{StaticResource Small}" LineBreakMode="TailTruncation" />
                         </VerticalStackLayout>
-                        <c:StatusChip Grid.Column="2" Kind="Info" Text="{Binding ClassText}" />
                     </Grid>
                 </Border>
 

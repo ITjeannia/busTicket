@@ -27,10 +27,13 @@ public partial class TicketViewModel(TicketFiles files, Navigator navigator) : O
     [ObservableProperty] public partial string PaymentText { get; set; } = "";
     [ObservableProperty] public partial string BoardingText { get; set; } = "";
     [ObservableProperty] public partial string CodeCaption { get; set; } = "";
+    [ObservableProperty] public partial string AgencyName { get; set; } = "";
+    [ObservableProperty] public partial string AgencyPlace { get; set; } = "";
     [ObservableProperty] public partial string? ExpiredMessage { get; set; }
     [ObservableProperty] public partial string? BoardedMessage { get; set; }
     [ObservableProperty] public partial ImageSource? QrCode { get; set; }
     [ObservableProperty] public partial bool IsBusy { get; set; }
+    [ObservableProperty] public partial bool ArrivesNextDay { get; set; }
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(IsValid))]
     public partial bool IsExpired { get; set; }
@@ -50,6 +53,7 @@ public partial class TicketViewModel(TicketFiles files, Navigator navigator) : O
         To = trip.To;
         DepartureTime = Formatters.Time(trip.Departure);
         ArrivalTime = Formatters.Time(trip.Arrival);
+        ArrivesNextDay = trip.ArrivesNextDay;
         DurationText = $"{Formatters.Duration(trip.Duration)} · {trip.StopsLabel}";
         DateLine = Formatters.LongDate(trip.Departure);
         Passenger = booking.PassengerName;
@@ -61,6 +65,9 @@ public partial class TicketViewModel(TicketFiles files, Navigator navigator) : O
         TotalText = Formatters.Price(booking.Payment.Total);
         PaymentText = $"{booking.Payment.MethodLabel} · {booking.Payment.AccountMasked}";
         BoardingText = $"Présentez-vous avant {Formatters.Time(trip.Departure.AddMinutes(-30))}";
+        var agency = Catalog.AgencyFor(trip.Company, trip.From);
+        AgencyName = agency.Name;
+        AgencyPlace = agency.Place;
         IsExpired = booking.IsExpired;
         IsBoarded = booking.IsBoarded;
 
@@ -123,6 +130,16 @@ public partial class TicketViewModel(TicketFiles files, Navigator navigator) : O
         if (_booking is null) return;
         try { await files.OpenAsync(_booking); }
         catch (Exception e) { await navigator.InfoAsync($"Aucune application ne peut ouvrir le PDF : {e.Message}"); }
+    }
+
+    /// <summary>Itinéraire Google Maps vers l'agence de départ.</summary>
+    [RelayCommand]
+    private async Task OpenDirectionsAsync()
+    {
+        if (_booking is null) return;
+        var agency = Catalog.AgencyFor(_booking.Trip.Company, _booking.Trip.From);
+        try { await Launcher.Default.OpenAsync(new Uri(agency.DirectionsUrl)); }
+        catch (Exception e) { await navigator.InfoAsync($"Impossible d'ouvrir la carte : {e.Message}"); }
     }
 
     [RelayCommand]

@@ -14,6 +14,7 @@ public record TicketItem(BookingDto Booking, int Index)
     public string DateText => Formatters.ShortDate(Trip.Departure);
     public string DepartureTime => Formatters.Time(Trip.Departure);
     public string ArrivalTime => Formatters.Time(Trip.Arrival);
+    public bool ArrivesNextDay => Trip.ArrivesNextDay;
     public string Details => $"{Formatters.Seats(Booking.Seats)} · {Trip.Company}";
     public string PriceText => Formatters.Price(Booking.Payment.Total);
 
@@ -36,5 +37,7 @@ public record TicketItem(BookingDto Booking, int Index)
     }
 
     public bool HasCountdown => Countdown is not null;
+    /// <summary>Départ aujourd'hui : le compte à rebours passe en orange.</summary>
+    public bool IsSoon => HasCountdown && Trip.Departure.Date <= DateTime.Today;
     public int EntranceDelay => Math.Min(Index, 6) * 60;
 }

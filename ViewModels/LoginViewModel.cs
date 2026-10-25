@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace BusTicket.ViewModels;
 
-/// <summary>Connexion par e-mail ou téléphone. Compte de démonstration : jean.dupont@mail.com / voyage123.</summary>
+/// <summary>Connexion par e-mail ou téléphone. Les comptes de test sont listés dans le README.</summary>
 public partial class LoginViewModel(Backend backend, BookingRepository bookings, Navigator navigator) : ObservableObject
 {
     [ObservableProperty] public partial string Identifier { get; set; } = "";
@@ -54,14 +54,6 @@ public partial class LoginViewModel(Backend backend, BookingRepository bookings,
         {
             IsLoading = false;
         }
-    }
-
-    /// <summary>Remplit le compte de démonstration.</summary>
-    [RelayCommand]
-    private void UseDemoAccount()
-    {
-        Identifier = BookingEngine.DemoEmail;
-        Password = BookingEngine.DemoPassword;
     }
 
     [RelayCommand]

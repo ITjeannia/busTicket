@@ -49,7 +49,12 @@
                                         <Label Text="{Binding DurationText}" Style="{StaticResource OnPrimaryMuted}" FontSize="11" HorizontalOptions="Center" />
                                     </VerticalStackLayout>
                                     <VerticalStackLayout Grid.Column="2">
-                                        <Label Text="{Binding ArrivalTime}" FontFamily="RobotoBold" FontSize="30" TextColor="White" HorizontalOptions="End" />
+                                        <HorizontalStackLayout HorizontalOptions="End" Spacing="2">
+                                            <Label Text="{Binding ArrivalTime}" FontFamily="RobotoBold" FontSize="30" TextColor="White" />
+                                            <Label Text="+1 j" FontFamily="RobotoMedium" FontSize="12" TextColor="White" VerticalOptions="Start"
+                                                   Margin="0,4,0,0" IsVisible="{Binding ArrivesNextDay}"
+                                                   SemanticProperties.Description="Arrivée le lendemain" />
+                                        </HorizontalStackLayout>
                                         <Label Text="{Binding To}" Style="{StaticResource OnPrimaryMuted}" HorizontalOptions="End" />
                                     </VerticalStackLayout>
                                 </Grid>
@@ -112,6 +117,27 @@
                     <Ellipse WidthRequest="22" HeightRequest="22" Fill="{x:Static t:AppColors.Background}"
                              HorizontalOptions="End" VerticalOptions="Start" Margin="0,0,-11,0" x:Name="NotchRight" />
                 </Grid>
+
+                <!-- Agence de départ : itinéraire Google Maps -->
+                <Border Style="{StaticResource MutedBox}" Padding="14,12" IsVisible="{Binding IsValid}"
+                        SemanticProperties.Description="Itinéraire Google Maps vers l'agence de départ">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Label Text="{x:Static h:MaterialIcons.Location}" Style="{StaticResource Icon}" FontSize="20" VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label Text="{Binding AgencyName}" Style="{StaticResource Small}" FontFamily="RobotoMedium"
+                                   TextColor="{x:Static t:AppColors.TextPrimary}" />
+                            <Label Text="{Binding AgencyPlace}" Style="{StaticResource Small}" />
+                        </VerticalStackLayout>
+                        <HorizontalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center">
+                            <Label Text="{x:Static h:MaterialIcons.Directions}" Style="{StaticResource Icon}" FontSize="18"
+                                   TextColor="{x:Static t:AppColors.Primary}" />
+                            <Label Text="Itinéraire" Style="{StaticResource Link}" FontSize="14" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenDirectionsCommand}" />
+                        </Grid.GestureRecognizers>
+                    </Grid>
+                </Border>
 
                 <Border Style="{StaticResource MutedBox}" Padding="14,12">
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">

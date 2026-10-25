@@ -32,7 +32,7 @@
                            c:Motion.Entrance="FadeUp" c:Motion.Delay="140" />
 
                     <Image Grid.Row="3" Source="illus_hero.png" Aspect="AspectFit"
-                           HeightRequest="150" Margin="-20,12,-20,24"
+                           HeightRequest="120" Margin="-20,12,-20,36"
                            c:Motion.Entrance="SlideLeft" c:Motion.Delay="200" />
                 </Grid>
 
@@ -48,9 +48,10 @@
                         <c:AlertBanner Kind="Error" Message="{Binding BannerError}" />
 
                         <c:AppTextField Label="E-mail ou téléphone"
-                                        Placeholder="jean.dupont@mail.com"
+                                        Placeholder="Votre e-mail ou numéro"
                                         Icon="{x:Static h:MaterialIcons.Mail}"
                                         Keyboard="Email"
+                                        ReturnType="Next"
                                         Text="{Binding Identifier}"
                                         ErrorText="{Binding IdentifierError}"
                                         IsEnabled="{Binding IsIdle}" />
@@ -58,6 +59,8 @@
                         <c:AppTextField Label="Mot de passe"
                                         Icon="{x:Static h:MaterialIcons.Lock}"
                                         IsPassword="True"
+                                        ReturnType="Go"
+                                        ReturnCommand="{Binding LoginCommand}"
                                         Text="{Binding Password}"
                                         ErrorText="{Binding PasswordError}"
                                         IsEnabled="{Binding IsIdle}" />
@@ -74,23 +77,6 @@
                                      LoadingText="Connexion…"
                                      IsLoading="{Binding IsLoading}"
                                      Command="{Binding LoginCommand}" />
-
-                        <!-- Compte de démonstration -->
-                        <Border Style="{StaticResource SoftBox}" Padding="12,10">
-                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
-                                <Label Text="{x:Static h:MaterialIcons.Info}" Style="{StaticResource Icon}" FontSize="18"
-                                       TextColor="{x:Static t:AppColors.Primary}" />
-                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                    <Label Text="Compte de démonstration" Style="{StaticResource Small}" FontFamily="RobotoMedium"
-                                           TextColor="{x:Static t:AppColors.Primary}" />
-                                    <Label Text="jean.dupont@mail.com · voyage123" Style="{StaticResource Small}" />
-                                </VerticalStackLayout>
-                                <Label Grid.Column="2" Text="Remplir" Style="{StaticResource Link}" FontSize="14" VerticalOptions="Center" />
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding UseDemoAccountCommand}" />
-                                </Grid.GestureRecognizers>
-                            </Grid>
-                        </Border>
                     </VerticalStackLayout>
                 </Border>
             </Grid>

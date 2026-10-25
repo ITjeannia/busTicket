@@ -21,7 +21,21 @@ dotnet build -t:Run -p:WindowsOnly=true          # Windows (sans les workloads A
 dotnet build -t:Run -f net10.0-android           # Android (émulateur ou téléphone branché)
 ```
 
-Compte de démonstration : **jean.dupont@mail.com / voyage123** (bouton « Remplir » sur l'écran de connexion).
+## Accès de test
+
+L'écran de connexion n'affiche aucun identifiant. Pour les tests, utiliser le compte de démonstration,
+créé automatiquement au premier lancement (côté serveur et dans la base locale hors ligne) :
+
+| Rôle | Identifiant | Mot de passe |
+|---|---|---|
+| Voyageur | `jean.dupont@mail.com` (ou `+237 6 90 12 34 56`) | `voyage123` |
+
+- **Espace contrôleur** (scan des billets) : se connecter avec ce même compte, puis **Profil › Espace contrôleur**.
+- **Nouveau compte** : « Créer un compte » sur l'écran de connexion (mot de passe : 8 caractères minimum, dont 1 chiffre).
+- **Paiement** : simulé, n'importe quel numéro Orange Money / MTN MoMo ou carte est accepté.
+
+Ces identifiants sont définis dans `Core/BookingEngine.cs` (`DemoEmail`, `DemoPassword`).
+À retirer avant toute mise en production.
 
 ### Générer l'APK Android
 

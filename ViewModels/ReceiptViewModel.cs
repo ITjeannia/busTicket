@@ -31,7 +31,7 @@ public partial class ReceiptViewModel(TicketFiles files, Navigator navigator) : 
         var pay = _booking.Payment;
         Reference = _booking.Reference;
         Route = trip.Route;
-        TripLine = $"{Formatters.ShortDate(trip.Departure)} · {Formatters.Time(trip.Departure)} · {Formatters.Seats(_booking.Seats)}";
+        TripLine = $"{Formatters.ShortDate(trip.Departure)} · {Formatters.TimeRange(trip.Departure, trip.Arrival)} · {Formatters.Seats(_booking.Seats)}";
         TotalText = Formatters.Price(pay.Total);
         TransactionId = pay.TransactionId;
         PaidAt = Formatters.Timestamp(pay.PaidAt);

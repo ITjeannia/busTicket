@@ -26,6 +26,7 @@ public static class MaterialIcons
     public const string Phone = "";           // phone_outlined
     public const string Location = "";        // location_on_outlined
     public const string LocationFilled = "";  // location_on
+    public const string Directions = "";    // directions_outlined
     public const string TripOrigin = "";      // trip_origin_outlined
     public const string Calendar = "";        // calendar_today_outlined
     public const string People = "";          // people_outline
@@ -73,6 +74,8 @@ public static class MaterialIcons
     public const string CheckCircleFilled = ""; // check_circle
     public const string CancelFilled = "";    // cancel
     public const string WarningFilled = "";   // warning
+    public const string Visibility = "";    // visibility_outlined
+    public const string VisibilityOff = ""; // visibility_off_outlined
     public const string Check = "";
     public const string DoneAll = "";         // done_all_outlined
     public const string CloudOff = "";        // cloud_off_outlined

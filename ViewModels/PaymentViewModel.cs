@@ -87,7 +87,7 @@ public partial class PaymentViewModel(Backend backend, BookingRepository booking
 
         Route = _trip.Route;
         TripDate = Formatters.LongDate(_trip.Departure);
-        TripTimes = $"{Formatters.Time(_trip.Departure)} → {Formatters.Time(_trip.Arrival)}";
+        TripTimes = Formatters.TimeRange(_trip.Departure, _trip.Arrival);
         TripDetails = $"{_trip.Company} · {_trip.ServiceClass} · {Formatters.Seats(_seats)}";
         TicketLabel = $"Billet{(_seats.Count > 1 ? "s" : "")} ({_seats.Count} × {Formatters.Price(_trip.Price)})";
         TicketPrice = Formatters.Price(_trip.Price * _seats.Count);
